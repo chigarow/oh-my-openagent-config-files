@@ -1,0 +1,468 @@
+{
+  // "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOP-LEVEL FEATURES (OmO v3.17.2)
+  // ─────────────────────────────────────────────────────────────────────────
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [400, 429, 503, 529],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CATEGORIES
+  //
+  // 3-PROVIDER STRATEGY:
+  //   github-copilot → visual-engineering, artistry, writing (Gemini models)
+  //                   → core agents Sisyphus/Prometheus (Claude models)
+  //   openai         → ultrabrain (premium GPT)
+  //   zai-coding-plan → deep, unspecified-high, unspecified-low, quick (budget GLM)
+  //
+  // CONSTRAINT: No GPT on GH Copilot. No Opus except Prometheus.
+  // ─────────────────────────────────────────────────────────────────────────
+  "categories": {
+    // Gemini 3.1 Pro via Copilot = OmO default for visual. Best creative reasoning.
+    // Copilot primary, Flash + 2.5 Pro fallback (all Copilot).
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5v-turbo"
+      ],
+      "variant": "high",
+      "description": "Gemini 3.1 Pro via Copilot excels at visual/frontend tasks. Copilot fallback."
+    },
+
+    // GPT-5.4 = OpenAI's strongest reasoning model for ultrabrain tasks.
+    // xhigh variant for maximum reasoning depth.
+    // GPT-5.3-codex (coding specialist) + zai-coding-plan/glm-5.1 fallbacks.
+    "ultrabrain": {
+      "model": "openai/gpt-5.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "variant": "high",
+      "description": "GPT-5.4 (xhigh) — OpenAI's strongest for deep reasoning. GPT-5.3-codex + zai-coding-plan/glm-5.1 fallbacks."
+    },
+
+    // zai-coding-plan/glm-5.1 = budget GLM for deep engineering tasks.
+    // GPT-5.3-codex (OpenAI coding) + zai-coding-plan/glm-5 fallbacks.
+    "deep": {
+      "model": "zai-coding-plan/glm-5.1",
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "openai/gpt-5.4-mini"
+      ],
+      "description": "GLM-5.1 via zAI — lowest hallucination + agentic engineering. GPT-5.3-codex/GLM-5-Turbo fallbacks."
+    },
+
+    // Gemini 3.1 Pro via Copilot for creative/unconventional approaches.
+    // OmO explicitly recommends Gemini for artistry.
+    // Copilot primary, Flash + 2.5 Pro fallback (all Copilot).
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5.1"
+      ],
+      "variant": "high",
+      "description": "Gemini 3.1 Pro via Copilot — different reasoning style for creative approaches. Copilot fallback."
+    },
+
+    // zai-coding-plan/glm-5 = budget GLM for complex work.
+    // GPT-5.4-mini (OpenAI fast) + zai-coding-plan/glm-5.1 fallbacks.
+    "unspecified-high": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "GLM-5-Turbo via zAI — budget GLM for complex work. GPT-5.4-mini/GLM-5.1 fallbacks."
+    },
+
+    // zai-coding-plan/glm-4.7 = budget GLM for moderate tasks.
+    // zai-coding-plan/glm-4.7 (faster) + zai-coding-plan/glm-5 fallbacks.
+    "unspecified-low": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "fallback_models": [
+        "openai/gpt-5.4-mini",
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "GLM-4.7 via zAI — budget GLM for moderate tasks. GLM-4.5-air/GLM-5-Turbo fallbacks."
+    },
+
+    // zai-coding-plan/glm-4.7 = fastest budget GLM for trivial tasks.
+    // zai-coding-plan/glm-4.7 (faster) + zai-coding-plan/glm-4.7 fallbacks.
+    "quick": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "fallback_models": [
+        "openai/gpt-5.4-mini",
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "GLM-4.5-air via zAI — fastest budget GLM for trivial tasks. GLM-4.7 fallback."
+    },
+
+    // Gemini Flash via Copilot excels at fluent text generation.
+    // Copilot primary, Gemini 2.5 Pro + zai-coding-plan/glm-5.1 fallbacks.
+    "writing": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "Gemini 3 Flash via Copilot — fast and fluent for documentation and prose. Copilot + zai-coding-plan fallback."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // AGENTS
+  //
+  // 3-PROVIDER STRATEGY:
+  //   github-copilot → sisyphus, prometheus (Claude ONLY — no GPT)
+  //                   → Gemini for visual/artistry/writing categories
+  //   openai         → hephaestus, atlas, oracle, momus, multimodal-looker (premium GPT)
+  //   zai-coding-plan → metis, explore, librarian, sisyphus-junior (budget GLM)
+  //
+  // HARD CONSTRAINTS:
+  //   ✗ No GPT on GH Copilot (Hephaestus uses OpenAI provider)
+  //   ✗ No Opus except Prometheus
+  //   ✗ No Sonnet for Atlas (Copilot Sonnet hangs on task delegation)
+  //   ✗ Sub-agents must NOT use GH Copilot as primary
+  //   ✓ Visual/artistry/writing categories use Copilot Gemini primary
+  //   ✓ Hephaestus uses OpenAI provider (not Copilot GPT)
+  //
+  // COPILOT MODELS:
+  //   ⭐ github-copilot/claude-sonnet-4.6 — Sisyphus (core agent)
+  //   ⭐ github-copilot/claude-opus-4.6 — Prometheus (ONLY Opus user)
+  //   ⭐ github-copilot/gemini-3.1-pro — visual/artistry categories
+  //   ⭐ github-copilot/gemini-3-flash — writing category
+  //   ⭐ github-copilot/gemini-2.5-pro — fallback for Gemini categories
+  //
+  // OPENAI MODELS:
+  //   ⭐ openai/gpt-5.4 — strongest reasoning, general-purpose
+  //   ⭐ openai/gpt-5.3-codex — coding specialist, optimized for engineering
+  //   ⭐ openai/gpt-5.4-mini — fast, efficient, good balance
+  //   ⭐ openai/gpt-5.1-codex-mini — fastest, for trivial tasks
+  //
+  // ZAI-CODING-PLAN MODELS:
+  //   ⭐ zai-coding-plan/glm-5.1 — strongest GLM, deep reasoning
+  //   ⭐ zai-coding-plan/glm-5 — general-purpose GLM
+  //   ⭐ zai-coding-plan/glm-5-turbo — fast GLM
+  //   ⭐ zai-coding-plan/glm-5v-turbo — vision-capable GLM
+  //   ⭐ zai-coding-plan/glm-4.7 — budget GLM
+  //   ⭐ zai-coding-plan/glm-4.7 — fastest budget GLM
+  //   ⭐ zai-coding-plan/glm-4.7 — ultra-fast budget GLM
+  // ─────────────────────────────────────────────────────────────────────────
+  "agents": {
+
+    // ══════════════════════════════════════════════════════════════════════
+    // CORE AGENTS — GH Copilot (Claude models ONLY, no GPT)
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Sisyphus = Claude Sonnet 4.6. Claude-ONLY agent (~1,100-line prompt).
+    // OmO default is Opus but Opus reserved for Prometheus only.
+    // Fallbacks: zai-coding-plan/glm-5.1 (strongest GLM) → zai-coding-plan/glm-5.
+    // NO GPT on Copilot — Sisyphus has no-sisyphus-gpt hook.
+    "sisyphus": {
+      "model": "github-copilot/claude-sonnet-4.6",
+      "variant": "high",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5.1"
+      ],
+      "description": "The Boss. Claude Sonnet 4.6 on Copilot. zai-coding-plan/glm-5.1/5 fallbacks."
+    },
+
+    // Hephaestus = GPT-5.3-codex on OpenAI provider. GPT-ONLY agent.
+    // Uses OpenAI provider (not Copilot GPT) per user constraint.
+    // GPT-5.4 → zai-coding-plan/glm-5.1 fallbacks — OpenAI + zai-coding-plan.
+    "hephaestus": {
+      "model": "openai/gpt-5.3-codex",
+      "temperature": 0.05,
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. GPT-5.3-codex on OpenAI provider → GPT-5.4/zai-coding-plan/glm-5.1 fallbacks. GPT-only agent."
+    },
+
+    // Prometheus = Claude Opus 4.6. The ONLY agent allowed to use Opus.
+    // Dual-prompt agent (auto-switches Claude/GPT prompts at runtime).
+    // Fallbacks: GPT-5.5 (flagship) → zai-coding-plan/glm-5.1 (strongest GLM).
+    // NO GPT on Copilot — saves Copilot quota entirely.
+    "prometheus": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+      "temperature": 0.4,
+      "fallback_models": [
+        "openai/gpt-5.5",
+        "zai-coding-plan/glm-5.1"
+      ],
+      "description": "The Architect. Claude Opus (ONLY agent with Opus). OpenAI GPT-5.5/zai-coding-plan/glm-5.1 fallbacks."
+    },
+
+    // Atlas = Plan Executor / Master Orchestrator. GPT-5.3-codex on OpenAI.
+    // Copilot Sonnet removed — HTTP/2 GOAWAY, 35-min timeouts, cache miss hangs.
+    // GPT-5.4 = coding specialist, 1M context for orchestration.
+    // GPT-5.4-mini (fast) + zai-coding-plan/glm-5.1 fallbacks.
+    "atlas": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.1,
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "The Finisher. GPT-5.4-mini — cheapest non-copilot (ATLAS RULE). zai-coding-plan/glm-5.1/glm-5-turbo fallbacks."
+    },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SUB-AGENTS — OpenAI + zai-coding-plan (zero Copilot primary)
+    //
+    // Model diversity ensures no single-point-of-failure:
+    //   oracle           → GPT-5.5 (high) — flagship reasoning
+    //   momus            → GPT-5.4 (high) — rigorous verification
+    //   metis            → zai-coding-plan/glm-5 — budget plan analysis
+    //   sisyphus-junior  → zai-coding-plan/glm-5 — budget task delegation
+    //   explore          → zai-coding-plan/glm-4.7 — fast utility scanning
+    //   librarian        → zai-coding-plan/glm-5 — budget doc retrieval
+    //   multimodal-looker→ GPT-5.4 — vision tasks
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Oracle = high-IQ reasoning for debugging/architecture consultation.
+    // GPT-5.5 (high variant) — OpenAI's flagship reasoning model.
+    // zai-coding-plan/glm-5.1 (strongest GLM) + zai-coding-plan/glm-5 fallbacks.
+    "oracle": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "temperature": 0.25,
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "The Debugger. GPT-5.5 (high) — OpenAI's flagship reasoning. zai-coding-plan/glm-5.1/5 fallbacks."
+    },
+
+    // Metis = pre-planning analysis, plan gap detection.
+    // zai-coding-plan/glm-5 — budget GLM for plan analysis.
+    // GPT-5.4-mini (OpenAI fast) + zai-coding-plan/glm-5.1 fallbacks.
+    "metis": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.4,
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo",
+        "zai-coding-plan/glm-4.7"
+      ],
+      "description": "Plan Consultant. zai-coding-plan/glm-5 for plan gap analysis. OpenAI GPT-5.4-mini/zai-coding-plan/glm-5.1 fallbacks."
+    },
+
+    // Momus = ruthless plan reviewer/verifier (value-tier).
+    // Momus = ruthless plan reviewer/verifier (value-tier).
+    // zai-coding-plan/glm-5.1 (strongest GLM) + zai-coding-plan/glm-5 fallbacks.
+    "momus": {
+      "model": "openai/gpt-5.4",
+      "variant": "high",
+      "temperature": 0.2,
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "Plan Reviewer. GPT-5.4 (high) — rigorous verification (value-tier). zai-coding-plan/glm-5.1/5 fallbacks."
+    },
+
+    // Explore = speed + tool calling is everything. Fire 10+ in parallel.
+    // zai-coding-plan/glm-4.7 — fastest budget GLM for utility scanning.
+    // zai-coding-plan/glm-4.7 + zai-coding-plan/glm-5 fallbacks.
+    "explore": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "temperature": 0.5,
+      "fallback_models": [
+        "openai/gpt-5.4-mini",
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "Utility Runner. zai-coding-plan/glm-4.7 — fast for parallel scanning. zai-coding-plan/glm-4.7/5 fallbacks."
+    },
+
+    // Librarian = doc retrieval, research, large context processing.
+    // zai-coding-plan/glm-5 — budget GLM for doc synthesis.
+    // zai-coding-plan/glm-5.1 (strongest GLM) + GPT-5.4-mini fallbacks.
+    "librarian": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "temperature": 0.3,
+      "fallback_models": [
+        "openai/gpt-5.4-mini",
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "Research & Documentation. zai-coding-plan/glm-5 — efficient doc synthesis. zai-coding-plan/glm-5.1/OpenAI GPT-5.4-mini fallbacks."
+    },
+
+    // Sisyphus-Junior = task delegation handler. Executes category-delegated tasks.
+    // zai-coding-plan/glm-5 — budget GLM, follows instructions well.
+    // zai-coding-plan/glm-4.7 + GPT-5.4-mini fallbacks.
+    "sisyphus-junior": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.1,
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo",
+        "zai-coding-plan/glm-4.7"
+      ],
+      "description": "Task Delegate. zai-coding-plan/glm-5. zai-coding-plan/glm-4.7/OpenAI GPT-5.4-mini fallbacks."
+    },
+
+    // Multimodal-looker = vision-capable model required (value-tier).
+    // Multimodal-looker = vision-capable model required (value-tier).
+    // zai-coding-plan/glm-5v-turbo (vision GLM) + zai-coding-plan/glm-5.1 fallbacks.
+    "multimodal-looker": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5v-turbo"
+      ],
+      "description": "Vision tasks. GPT-5.4 — OpenAI's vision-capable model (value-tier). zai-coding-plan/glm-5v-turbo/5.1 fallbacks."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BACKGROUND TASK CONCURRENCY
+  //
+  // 3-provider distribution:
+  //   github-copilot → 2 core agents (Sisyphus/Prometheus) + Gemini for visual/artistry/writing
+  //   openai         → Hephaestus + Atlas + Oracle + Momus + Multimodal-looker + ultrabrain category
+  //   zai-coding-plan → Metis + Explore + Librarian + Sisyphus-junior + deep/unspecified/quick categories
+  //
+  // zai-coding-plan has generous limits so budget agents get plenty of headroom.
+  // ─────────────────────────────────────────────────────────────────────────
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      // Copilot: 2 core agents + Gemini categories — cap to avoid quota burn
+      "github-copilot": 12,
+      // OpenAI: Hephaestus + Atlas + Oracle + Momus + Multimodal-looker + ultrabrain — generous headroom
+      "openai": 15,
+      // zai-coding-plan: Metis + Explore + Librarian + Sisyphus-junior + deep/unspecified/quick — highest limits
+      "zai-coding-plan": 20,
+      "opencode": 10,
+      "anthropic": 5
+    },
+    "modelConcurrency": {
+      // ── Copilot Core Agents ──
+      // Sonnet: sisyphus only
+      "github-copilot/claude-sonnet-4.6": 2,
+      // Gemini via Copilot: visual/artistry/writing categories
+      "github-copilot/gemini-3.1-pro-preview": 5,
+      // ── OpenAI Core Agents ──
+      // GPT-5.3-codex: Hephaestus only
+      "openai/gpt-5.3-codex": 2,
+      // GPT-5.5: Oracle (flagship) + Prometheus fallback
+      "openai/gpt-5.5": 4,
+      // GPT-5.4: Atlas + Momus + Multimodal-looker + ultrabrain (value tier)
+      "openai/gpt-5.4": 8,
+      // GPT-5.4-mini: Atlas fallback + Metis fallback + Librarian fallback
+      "openai/gpt-5.4-mini": 6,
+      // GPT-5.1-codex-mini: minimal usage
+      "openai/gpt-5.1-codex-mini": 4,
+      // ── zai-coding-plan Agents ──
+      // glm-5.1: Sisyphus fallback + Prometheus fallback + Oracle fallback + Momus fallback + Librarian primary + deep category
+      "zai-coding-plan/glm-5.1": 8,
+      // glm-5-turbo: metis/librarian/explore/quick/delegation workload
+      "zai-coding-plan/glm-5-turbo": 8,
+      // glm-5v-turbo: Multimodal-looker fallback
+      "zai-coding-plan/glm-5v-turbo": 2,
+      // glm-4.7: Explore fallback + Sisyphus-junior fallback + unspecified-low category
+      "zai-coding-plan/glm-4.7": 10  // Quick + utility tasks
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // EXPERIMENTAL (OmO v3.17.2 features)
+  // ─────────────────────────────────────────────────────────────────────────
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+
+  "skills": {
+    "sources": [
+      { "path": "~/.config/opencode/skills", "recursive": true }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

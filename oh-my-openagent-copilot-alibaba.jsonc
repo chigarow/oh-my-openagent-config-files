@@ -1,0 +1,409 @@
+{
+  // "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOP-LEVEL FEATURES (OmO v3.17.1)
+  // ─────────────────────────────────────────────────────────────────────────
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+
+
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [400, 429, 503, 529],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CATEGORIES
+  //
+  // 2-PROVIDER STRATEGY:
+  //   github-copilot     → visual-engineering, artistry, writing (Gemini models)
+  //                       → core agents (Claude/GPT)
+  //   alibaba-coding-plan → ultrabrain, deep, unspecified-high, unspecified-low, quick
+  //                        → ALL sub-agents
+  //
+  // CONSTRAINT: No GPT on GH Copilot (except Hephaestus). No Opus except Prometheus.
+  // ─────────────────────────────────────────────────────────────────────────
+  "categories": {
+    // Gemini 3.1 Pro via Copilot = OmO default for visual. Best creative reasoning.
+    // Copilot primary, Kimi K2.5 fallback.
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "variant": "medium",
+      "description": "Gemini 3.1 Pro via Copilot excels at visual/frontend tasks. Kimi K2.5 fallback."
+    },
+
+    // Claude Sonnet 4.6 on Copilot for ultrabrain reasoning.
+    // Qwen3.5 Plus fallback (Deep Thinking + Vision).
+    "ultrabrain": {
+      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
+      ],
+      "variant": "high",
+      "description": "Claude Sonnet 4.6 (high) — Copilot primary. Qwen3.5 Plus Deep Thinking fallback."
+    },
+
+    // Claude Sonnet 4.6 on Copilot for deep engineering.
+    // Qwen3.5 Plus fallback (Deep Thinking).
+    "deep": {
+      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "fallback_models": [
+        "alibaba-coding-plan/glm-5"
+      ],
+      "variant": "medium",
+      "description": "Claude Sonnet 4.6 (medium) — Copilot primary. Qwen3.5 Plus fallback."
+    },
+
+    // Gemini 3.1 Pro via Copilot for creative/unconventional approaches.
+    // OmO explicitly recommends Gemini for artistry.
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "variant": "medium",
+      "description": "Gemini 3.1 Pro via Copilot — creative reasoning. Kimi K2.5 fallback."
+    },
+
+    // Claude Sonnet 4.6 on Copilot for complex general work.
+    // Kimi K2.5 fallback (Claude-like, strong reasoning).
+    "unspecified-high": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.5-plus"
+      ],
+      "variant": "medium",
+      "description": "Claude Sonnet 4.6 (medium) — Copilot primary. Kimi K2.5 Claude-like fallback."
+    },
+
+    // Claude Sonnet 4.6 on Copilot for moderate tasks.
+    // MiniMax M2.5 fallback (best SWE-bench, fast).
+    "unspecified-low": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "alibaba-coding-plan/glm-4.7"
+      ],
+      "variant": "low",
+      "description": "Claude Sonnet 4.6 (low) — Copilot primary. MiniMax M2.5 fast fallback."
+    },
+
+    // Claude Sonnet 4.6 on Copilot for trivial tasks.
+    // MiniMax M2.5 fallback (best SWE-bench, fast).
+    "quick": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "alibaba-coding-plan/glm-4.7"
+      ],
+      "variant": "low",
+      "description": "Claude Sonnet 4.6 (low) — Copilot primary. MiniMax M2.5 fast fallback."
+    },
+
+    // Claude Sonnet 4.6 on Copilot for documentation and prose.
+    // Qwen3.5 Plus fallback (Deep Thinking).
+    "writing": {
+      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "variant": "medium",
+      "description": "Claude Sonnet 4.6 (medium) — Copilot primary. Qwen3.5 Plus fallback."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // AGENTS
+  //
+  // 2-PROVIDER STRATEGY:
+  //   github-copilot     → sisyphus, prometheus (Claude ONLY — no GPT!)
+  //                       → hephaestus (GPT exception — GPT-native agent)
+  //                       → Gemini for visual/artistry/writing categories
+  //   alibaba-coding-plan → atlas + ALL sub-agents (oracle, metis, momus,
+  //                         explore, librarian, sisyphus-junior, multimodal-looker)
+  //
+  // HARD CONSTRAINTS:
+  //   ✗ No GPT on GH Copilot (except Hephaestus)
+  //   ✗ No Opus except Prometheus
+  //   ✗ No Sonnet for Atlas (Copilot Sonnet hangs on task delegation)
+  //   ✗ Sub-agents must NOT use GH Copilot as primary
+  //   ✓ Visual/artistry/writing categories use Copilot Gemini primary
+  //   ✓ Hephaestus OK on GH Copilot GPT (GPT-native agent)
+  //
+  // BAILIAN CODING PLAN MODELS:
+  //   ⭐ MiniMax M2.5     — SWE-bench 80.2%, BFCL 76.8% (best tool calling)
+  //   ⭐ Kimi K2.5        — AIME 95.63%, SWE-bench 76.8%, native vision
+  //   ⭐ GLM-5            — Arena ELO 1456, lowest hallucination, interleaved thinking
+  //   ⭐ Qwen3.5 Plus     — LiveCodeBench 85.33%, 1M context, Deep Thinking + Vision
+  //   ⭐ Qwen3 Max        — Deep Thinking, rigorous reasoning
+  //   ⭐ GLM-4.7          — Fast, SOTA coding (SWE-bench 73.8%)
+  //   ❌ GLM-5.1          — NOT on Bailian Coding Plan
+  //   ❌ DeepSeek V4-Pro    — NOT on Bailian Coding Plan
+  // ─────────────────────────────────────────────────────────────────────────
+  "agents": {
+
+    // ══════════════════════════════════════════════════════════════════════
+    // CORE AGENTS — GH Copilot primary, Bailian fallback
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Sisyphus = Claude Sonnet 4.6. Claude-ONLY agent (~1,100-line prompt).
+    // Kimi K2.5 (Claude-like on Bailian) fallback.
+    "sisyphus": {
+      "model": "github-copilot/claude-sonnet-4.6",
+      "variant": "high",
+      "temperature": 0.1,
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "description": "The Boss. Claude Sonnet 4.6 on Copilot. Kimi K2.5 Claude-like fallback."
+    },
+
+    // Hephaestus = GPT-5.3-codex. GPT-ONLY agent.
+    // Qwen3 Max fallback on Bailian.
+    "hephaestus": {
+      "model": "github-copilot/gpt-5.3-codex",
+      "temperature": 0.05,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
+      ],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. GPT-5.3-codex on Copilot. Qwen3 Max fallback. GPT-only agent."
+    },
+
+    // Prometheus = Gemini 3.1 Pro on Copilot for planning.
+    // Qwen3.5 Plus fallback (Deep Thinking).
+    "prometheus": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+      "temperature": 0.4,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.5-plus"
+      ],
+      "description": "The Architect. Gemini 3.1 Pro on Copilot. Qwen3.5 Plus fallback."
+    },
+
+    // Atlas = Plan Executor. Qwen3.5 Plus on Bailian primary (NO Copilot Sonnet — hangs).
+    // Gemini 3.1 Pro on Copilot fallback.
+    "atlas": {
+      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "temperature": 0.1,
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "description": "The Finisher. Qwen3.5 Plus on Bailian primary. Gemini Copilot fallback."
+    },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SUB-AGENTS — Copilot Sonnet primary, Bailian fallback
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Oracle = high-IQ reasoning. Copilot Sonnet primary.
+    // Qwen3.5 Plus fallback (Deep Thinking).
+    "oracle": {
+      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "variant": "high",
+      "temperature": 0.25,
+      "fallback_models": [
+        "alibaba-coding-plan/glm-5"
+      ],
+      "description": "The Debugger. Copilot Sonnet 4.6 (high). Qwen3.5 Plus fallback."
+    },
+
+    // Metis = pre-planning analysis. Copilot Sonnet primary.
+    // Kimi K2.5 fallback (Claude-like).
+    "metis": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "temperature": 0.4,
+      "fallback_models": [
+        "alibaba-coding-plan/glm-5"
+      ],
+      "description": "Plan Consultant. Copilot Sonnet 4.6 (low). Kimi K2.5 fallback."
+    },
+
+    // Momus = plan reviewer. Copilot Sonnet primary.
+    // Qwen3.5 Plus fallback (Deep Thinking).
+    "momus": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "variant": "high",
+      "temperature": 0.2,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.5-plus"
+      ],
+      "description": "Plan Reviewer. Copilot Sonnet 4.6 (high). Qwen3.5 Plus fallback."
+    },
+
+    // Explore = speed + tool calling. Copilot Sonnet primary.
+    // MiniMax M2.5 fallback (best tool calling).
+    "explore": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "temperature": 0.5,
+      "fallback_models": [
+        "alibaba-coding-plan/glm-4.7"
+      ],
+      "description": "Utility Runner. Copilot Sonnet 4.6 (low). MiniMax M2.5 fallback."
+    },
+
+    // Librarian = research. Copilot Sonnet primary.
+    // GLM-5 fallback (lowest hallucination).
+    "librarian": {
+      "model": "alibaba-coding-plan/glm-5",
+      "temperature": 0.3,
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "description": "Research & Documentation. Copilot Sonnet 4.6 (low). GLM-5 fallback."
+    },
+
+    // Sisyphus-Junior = task delegation. Copilot Sonnet primary.
+    // Kimi K2.5 fallback (Claude-like).
+    "sisyphus-junior": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "temperature": 0.1,
+      "fallback_models": [
+        "alibaba-coding-plan/MiniMax-M2.5"
+      ],
+      "description": "Task Delegate. Copilot Sonnet 4.6 (low). Kimi K2.5 fallback."
+    },
+
+    // Multimodal-looker = vision. Gemini on Copilot primary.
+    // Kimi K2.5 fallback (native multimodal).
+    "multimodal-looker": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "temperature": 0.1,
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "description": "Vision tasks. Gemini 3.1 Pro on Copilot (medium). Kimi K2.5 fallback."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BACKGROUND TASK CONCURRENCY
+  //
+  // 2-provider distribution:
+  //   github-copilot     → 3 core agents + Gemini for visual/artistry/writing
+  //   alibaba-coding-plan → atlas + ALL sub-agents + non-visual categories
+  //
+  // Bailian Coding Plan has generous limits so sub-agents get plenty of headroom.
+  // ─────────────────────────────────────────────────────────────────────────
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      // Copilot: 3 core agents + Gemini categories — cap to avoid quota burn
+      "github-copilot": 12,
+      // Bailian: atlas + all sub-agents + non-visual categories — generous headroom
+      "alibaba-coding-plan": 25,
+      "opencode": 10,
+      "anthropic": 5
+    },
+    "modelConcurrency": {
+      // ── Copilot Core Agents ──
+      // Sonnet: sisyphus + oracle + momus + all sub-agents + ultrabrain + deep + writing
+      "github-copilot/claude-sonnet-4.6": 10,
+      // GPT: hephaestus only (GPT exception)
+      "github-copilot/gpt-5.3-codex": 2,
+      // Gemini: prometheus + atlas fallback + multimodal-looker + visual-eng + artistry
+      "github-copilot/gemini-3.1-pro-preview": 6,
+      // ── Bailian Models ──
+      // Kimi K2.5: sisyphus fallback + multimodal-looker fallback + visual-eng fallback + artistry fallback + unspecified-high fallback + metis fallback + SJ fallback
+      "alibaba-coding-plan/kimi-k2.5": 8,
+      // Qwen3.5 Plus: atlas + oracle fallback + prometheus fallback + ultrabrain fallback + deep fallback + writing fallback + momus fallback
+      "alibaba-coding-plan/qwen3.5-plus": 6,
+      // Qwen3 Max: hephaestus fallback
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 4,
+      // GLM-5: librarian
+      "alibaba-coding-plan/glm-5": 4,
+      // MiniMax M2.5: explore + unspecified-low + quick
+      "alibaba-coding-plan/MiniMax-M2.5": 6
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // EXPERIMENTAL (OmO v3.17.1 features)
+  // ─────────────────────────────────────────────────────────────────────────
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+
+  "skills": {
+    "sources": [
+      { "path": "~/.config/opencode/skills", "recursive": true }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

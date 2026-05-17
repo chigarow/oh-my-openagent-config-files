@@ -1,0 +1,261 @@
+{
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [
+      400,
+      429,
+      503,
+      529
+    ],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5v-turbo"
+      ],
+      "variant": "medium"
+    },
+    "artistry": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "variant": "medium"
+    },
+    "ultrabrain": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "variant": "high"
+    },
+    "deep": {
+      "model": "zai-coding-plan/glm-5.1",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "variant": "medium"
+    },
+    "unspecified-high": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "variant": "medium"
+    },
+    "unspecified-low": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "variant": "low"
+    },
+    "quick": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "fallback_models": [
+        "alibaba-coding-plan/MiniMax-M2.5"
+      ],
+      "variant": "low"
+    },
+    "writing": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "variant": "medium"
+    }
+  },
+  "agents": {
+    "sisyphus": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "variant": "high",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "description": "The Boss. Kimi K2.5 (high) on Alibaba. ZAI GLM-5.1 fallback."
+    },
+    "prometheus": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "description": "The Architect. Qwen 3.6 Plus (high) on Alibaba. ZAI GLM-5.1 fallback."
+    },
+    "hephaestus": {
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "variant": "medium",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. Qwen3 Max (medium) on Alibaba. ZAI GLM-5.1 fallback."
+    },
+    "atlas": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "description": "The Finisher. Qwen 3.6 Plus (high) on Alibaba. ZAI GLM-5.1 fallback."
+    },
+    "oracle": {
+      "model": "zai-coding-plan/glm-5.1",
+      "variant": "high",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "The Debugger. GLM-5.1 (high) on ZAI. Alibaba Qwen 3.6 Plus fallback."
+    },
+    "metis": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "variant": "low",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "Plan Consultant. Kimi K2.5 (low) on Alibaba. ZAI GLM-5-turbo fallback."
+    },
+    "momus": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ],
+      "description": "Plan Reviewer. Qwen 3.6 Plus (high) on Alibaba. ZAI GLM-5.1 fallback."
+    },
+    "explore": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "variant": "low",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "Utility Runner. MiniMax M2.5 (low) on Alibaba. ZAI GLM-5-turbo fallback."
+    },
+    "librarian": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "variant": "low",
+      "fallback_models": [
+        "alibaba-coding-plan/MiniMax-M2.5"
+      ],
+      "description": "Research & Documentation. GLM-5-turbo (low) on ZAI. Alibaba GLM-5 fallback."
+    },
+    "sisyphus-junior": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "variant": "low",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ],
+      "description": "Task Delegate. Kimi K2.5 (low) on Alibaba. ZAI GLM-5-turbo fallback."
+    },
+    "multimodal-looker": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "variant": "medium",
+      "fallback_models": [
+        "zai-coding-plan/glm-5v-turbo"
+      ],
+      "description": "Vision tasks. Kimi K2.5 (medium) on Alibaba. ZAI GLM-5v-turbo fallback."
+    }
+  },
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      "alibaba-coding-plan": 8,
+      "zai-coding-plan": 6
+    },
+    "modelConcurrency": {
+      "alibaba-coding-plan/kimi-k2.5": 8,
+      "alibaba-coding-plan/qwen3.6-plus": 6,
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 4,
+      "alibaba-coding-plan/MiniMax-M2.5": 5,
+      "zai-coding-plan/glm-5.1": 8,
+      "zai-coding-plan/glm-5-turbo": 6,
+      "zai-coding-plan/glm-5v-turbo": 4
+    }
+  },
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+  "skills": {
+    "sources": [
+      {
+        "path": "~/.config/opencode/skills",
+        "recursive": true
+      }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

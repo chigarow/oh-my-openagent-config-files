@@ -1,0 +1,315 @@
+{
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Oh-My-OpenAgent Configuration
+  // Providers: github-copilot, alibaba-coding-plan, zai-coding-plan
+  // Strategy: Copilot for main agents (Sonnet/Opus/Gemini) + hephaestus (GPT via copilot),
+  //           sub-agents on alibaba/zai only
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+
+  // ── Sisyphus Agent ──────────────────────────────────────────────────────────
+  // Planner + task system
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+
+  // ── Runtime Fallback ────────────────────────────────────────────────────────
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [400, 429, 503, 529],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+
+  // ── Categories ──────────────────────────────────────────────────────────────
+  "categories": {
+    // Visual/UI engineering — Gemini 3.1 Pro for layout, component design
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+    // Creative/artistic tasks — Gemini 3.1 Pro for aesthetic judgment
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+    // Deep reasoning — Qwen 3.6 Plus strongest alibaba reasoning
+    "ultrabrain": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+    // Deep analysis — GLM-5.1 lowest hallucination for research-grade output
+    "deep": {
+      "model": "zai-coding-plan/glm-5.1",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ]
+    },
+    // High-capability general — Kimi K2.5 strong all-rounder
+    "unspecified-high": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+    // Budget general — MiniMax M2.5 best SWE-bench for cost
+    "unspecified-low": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ]
+    },
+    // Fast/low-latency — GLM-5-turbo fast and reliable
+    "quick": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "fallback_models": [
+        "alibaba-coding-plan/MiniMax-M2.5"
+      ]
+    },
+    // Writing/docs — Qwen 3.6 Plus for natural prose
+    "writing": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ]
+    }
+  },
+
+  // ── Agents ──────────────────────────────────────────────────────────────────
+  // Constraints:
+  //   - Copilot: sonnet-4.6, opus-4.6, gemini-3.1-pro, gpt-5.3-codex (hephaestus)
+  //   - Sub-agents: alibaba + zai only
+  //   - Cross-provider fallbacks enforced
+  "agents": {
+
+    // ── Core Agents ───────────────────────────────────────────────────────────
+
+    // Sisyphus: main autonomous builder — Sonnet 4.6 with high effort variant
+    "sisyphus": {
+      "model": "github-copilot/claude-sonnet-4.6",
+      "variant": "high",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // Prometheus: planner/orchestrator — Opus 4.6 with max variant
+    "prometheus": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // Hephaestus: code generation specialist — GPT-5.3 Codex via copilot
+    "hephaestus": {
+      "model": "github-copilot/gpt-5.3-codex",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3-max-2026-01-23",
+        "zai-coding-plan/glm-5.1"
+      ],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      }
+    },
+
+    // Atlas: task delegation — Qwen 3.6 Plus strong reasoning
+    "atlas": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // ── Sub-Agents ────────────────────────────────────────────────────────────
+
+    // Oracle: verification/judgment — Qwen 3.6 Plus strongest reasoning on alibaba
+    "oracle": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // Metis: pre-planning analysis — Kimi K2.5 Claude-like thoroughness
+    "metis": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ]
+    },
+
+    // Momus: critic/negative reviewer — GLM-5.1 lowest hallucination for sharp criticism
+    "momus": {
+      "model": "zai-coding-plan/glm-5.1",
+      "variant": "high",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ]
+    },
+
+    // Explore: codebase navigation — MiniMax M2.5 fast SWE-bench scanning
+    "explore": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ]
+    },
+
+    // Librarian: knowledge/search — GLM-5-turbo reliable research
+    "librarian": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "fallback_models": [
+        "alibaba-coding-plan/glm-5"
+      ]
+    },
+
+    // Sisyphus-Junior: focused task executor — Kimi K2.5 Claude-like execution
+    "sisyphus-junior": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo"
+      ]
+    },
+
+    // Multimodal-looker: vision/image analysis — Gemini 3.1 Pro via copilot (multimodal)
+    "multimodal-looker": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "zai-coding-plan/glm-5v-turbo"
+      ]
+    }
+  },
+
+  // ── Background Task ─────────────────────────────────────────────────────────
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+
+    // Provider-level concurrency limits
+    "providerConcurrency": {
+      "github-copilot": 6,      // Sonnet + Opus + Gemini + GPT-codex
+      "alibaba-coding-plan": 6, // Qwen/Kimi/MiniMax/GLM
+      "zai-coding-plan": 6      // GLM family
+    },
+
+    // Per-model concurrency
+    "modelConcurrency": {
+
+      // ── github-copilot ──────────────────────────────────────────────────────
+      "github-copilot/claude-sonnet-4.6": 4,           // Sisyphus — main builder
+      "github-copilot/gpt-5.3-codex": 3,              // Hephaestus — code specialist
+      "github-copilot/gemini-3.1-pro-preview": 3,     // Visual/artistry/multimodal-looker
+
+      // ── alibaba-coding-plan ─────────────────────────────────────────────────
+      "alibaba-coding-plan/qwen3.6-plus": 5,           // Oracle/atlas/prometheus fallback + categories
+      "alibaba-coding-plan/kimi-k2.5": 5,              // Metis/sisyphus-junior + heavy fallback
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 3,   // Hephaestus fallback
+      "alibaba-coding-plan/qwen3.5-plus": 3,           // Librarian fallback
+      "alibaba-coding-plan/MiniMax-M2.5": 5,           // Explore primary + quick/unspecified-low
+      "alibaba-coding-plan/glm-5": 3,                  // Librarian fallback
+      "alibaba-coding-plan/glm-4.7": 4,                // Explore/unspecified-low fallback
+
+      // ── zai-coding-plan (GLM family only) ───────────────────────────────────
+      "zai-coding-plan/glm-5.1": 4,                    // Deep/momus primary + heavy fallback usage
+      "zai-coding-plan/glm-5-turbo": 5,                // Librarian primary + quick/metis/sisyphus-junior
+      "zai-coding-plan/glm-5v-turbo": 3                // Multimodal-looker fallback — vision capable
+    }
+  },
+
+  // ── Experimental ────────────────────────────────────────────────────────────
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+
+  // ── Skills ──────────────────────────────────────────────────────────────────
+  "skills": {
+    "sources": [
+      {
+        "path": "~/.config/opencode/skills",
+        "recursive": true
+      }
+    ]
+  },
+
+  "disabled_hooks": [],
+  "auto_update": true,
+
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [
+      400,
+      429,
+      503,
+      529
+    ],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [],
+      "variant": "high",
+      "description": "Kimi K2.5 \u2014 Deep Thinking + Visual Understanding for frontend tasks. Qwen3.5/GLM-5 fallbacks."
+    },
+    "ultrabrain": {
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
+      "fallback_models": [],
+      "description": "Qwen3 Max — AIME 100 (thinking mode), deepest reasoning for hard logic."
+    },
+    "deep": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [],
+      "description": "Qwen3.6 Plus — Deep Thinking + 1M ctx for autonomous deep research."
+    },
+    "artistry": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [],
+      "variant": "high",
+      "description": "Kimi K2.5 \u2014 Claude-like creative reasoning + Visual Understanding. Qwen3.5/GLM-5 fallbacks."
+    },
+    "unspecified-high": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [],
+      "description": "Qwen3.6 Plus — best overall balance (AIME 95.3, SWE 78.8, 1M ctx)."
+    },
+    "unspecified-low": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [],
+      "description": "MiniMax M2.5 \u2014 best SWE-bench (80.2%), fast and smart for moderate tasks."
+    },
+    "quick": {
+      "model": "alibaba-coding-plan/glm-4.7",
+      "fallback_models": [],
+      "description": "GLM-4.7 — fastest (92 tok/s), decent coding for trivial tasks."
+    },
+    "writing": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [],
+      "description": "Qwen3.6 Plus — deep thinking + 1M ctx for documentation and prose."
+    }
+  },
+  "agents": {
+    "sisyphus": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "variant": "high",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "The Boss. Kimi K2.5 — Claude-like agentic coding (SWE 76.8, vision)."
+    },
+    "hephaestus": {
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
+      "temperature": 0.05,
+      "fallback_models": [],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. Qwen3 Max — AIME 100, deepest reasoning for long autonomous tasks."
+    },
+    "prometheus": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
+      "temperature": 0.4,
+      "fallback_models": [],
+      "description": "The Architect. Qwen3.6 Plus — AIME 95.3, Deep Thinking + 1M ctx for planning."
+    },
+    "atlas": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "The Finisher. Qwen3.6 Plus — 1M ctx orchestrator, deep thinking for long journeys."
+    },
+    "oracle": {
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
+      "variant": "high",
+      "temperature": 0.25,
+      "fallback_models": [],
+      "description": "The Debugger. Qwen3 Max — AIME 100 (thinking), deepest reasoning for hard problems."
+    },
+    "metis": {
+      "model": "alibaba-coding-plan/glm-5",
+      "temperature": 0.4,
+      "fallback_models": [],
+      "description": "Plan Consultant. GLM-5 — lowest hallucination (τ²-Bench 89.7) for plan gap analysis."
+    },
+    "momus": {
+      "model": "alibaba-coding-plan/glm-5",
+      "variant": "high",
+      "temperature": 0.2,
+      "fallback_models": [],
+      "description": "Plan Reviewer. GLM-5 — lowest hallucination for rigorous verification."
+    },
+    "explore": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "temperature": 0.5,
+      "fallback_models": [],
+      "description": "Utility Runner. MiniMax M2.5 — BFCL 76.8, 100 tok/s, SWE 80.2."
+    },
+    "librarian": {
+      "model": "alibaba-coding-plan/glm-5",
+      "temperature": 0.3,
+      "fallback_models": [],
+      "description": "Research & Documentation. GLM-5 — lowest hallucination, reliable research."
+    },
+    "sisyphus-junior": {
+      "model": "alibaba-coding-plan/glm-4.7",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "Task Delegate. GLM-4.7 — fastest (92 tok/s) for quick delegated tasks."
+    },
+    "multimodal-looker": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "Vision tasks. Kimi K2.5 — native multimodal, 256K ctx."
+    }
+  },
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      "alibaba-coding-plan": 30,
+      "opencode": 10
+    },
+    "modelConcurrency": {
+      "alibaba-coding-plan/qwen3.6-plus": 8,
+      "alibaba-coding-plan/kimi-k2.5": 10,
+      "alibaba-coding-plan/MiniMax-M2.5": 12,
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 4,
+      "alibaba-coding-plan/glm-4.7": 12,
+      "alibaba-coding-plan/glm-5": 8
+    }
+  },
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+  "skills": {
+    "sources": [
+      {
+        "path": "~/.config/opencode/skills",
+        "recursive": true
+      }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

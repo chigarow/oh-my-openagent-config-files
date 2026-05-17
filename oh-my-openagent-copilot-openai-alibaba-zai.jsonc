@@ -1,0 +1,345 @@
+{
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Oh-My-OpenAgent Configuration
+  // Providers: github-copilot, openai, alibaba-coding-plan, zai-coding-plan
+  // Strategy: Copilot for main agents + multimodal-looker (Sonnet/Gemini only), other sub-agents on openai/alibaba/zai
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+
+  // ── Sisyphus Agent ──────────────────────────────────────────────────────────
+  // Planner + task system
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+
+  // ── Runtime Fallback ────────────────────────────────────────────────────────
+  // Automatic retry with model fallback on transient errors
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [400, 429, 503, 529],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+
+  // ── Categories ──────────────────────────────────────────────────────────────
+  // Role-based model selection for different task types.
+  // Cross-provider fallbacks ensure resilience.
+  "categories": {
+    // Visual/UI engineering — Gemini 3.1 Pro for layout, component design
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5v-turbo"
+      ]
+    },
+    // Creative/artistic tasks — Gemini 3.1 Pro for aesthetic judgment
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+    // Deep reasoning — GPT-5.5 flagship for complex logic chains
+    "ultrabrain": {
+      "model": "openai/gpt-5.5",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+    // Deep analysis — GLM-5.1 lowest hallucination for research-grade output
+    "deep": {
+      "model": "zai-coding-plan/glm-5.1",
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "alibaba-coding-plan/qwen3.6-plus"
+      ]
+    },
+    // High-capability general — GPT-5.4 strong all-rounder
+    "unspecified-high": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+    // Budget general — MiniMax M2.5 best SWE-bench for cost
+    "unspecified-low": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo",
+        "openai/gpt-5.4-mini"
+      ]
+    },
+    // Fast/low-latency — GLM-5-turbo fast and reliable
+    "quick": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "fallback_models": [
+        "alibaba-coding-plan/MiniMax-M2.5",
+        "openai/gpt-5.4-mini"
+      ]
+    },
+    // Writing/docs — GPT-5.4 for natural prose
+    "writing": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus",
+        "zai-coding-plan/glm-5.1"
+      ]
+    }
+  },
+
+  // ── Agents ──────────────────────────────────────────────────────────────────
+  // Core agents: sisyphus, prometheus, hephaestus, atlas
+  // Sub-agents: oracle, metis, momus, explore, librarian, sisyphus-junior, multimodal-looker
+  //
+  // Constraints applied:
+  //   - Copilot only for: sonnet-4.6 (sisyphus), gemini-3.1-pro (prometheus, multimodal-looker, categories)
+  //   - Sub-agents use openai/alibaba/zai only (except multimodal-looker on copilot/gemini)
+  //   - Cross-provider fallbacks enforced
+  //   - No qwen3-coder-next/plus
+  "agents": {
+
+    // ── Core Agents ───────────────────────────────────────────────────────────
+
+    // Sisyphus: main autonomous builder — Sonnet 4.6 with high effort variant
+    "sisyphus": {
+      "model": "github-copilot/claude-sonnet-4.6",
+      "variant": "high",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // Prometheus: planner/orchestrator — Gemini 3.1 Pro with high variant for planning
+    "prometheus": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+      "fallback_models": [
+        "openai/gpt-5.5",
+        "alibaba-coding-plan/qwen3.6-plus",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // Hephaestus: code generation specialist — GPT-5.3 Codex tuned for code
+    "hephaestus": {
+      "model": "openai/gpt-5.3-codex",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3-max-2026-01-23",
+        "zai-coding-plan/glm-5.1"
+      ],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      }
+    },
+
+    // Atlas: task delegation — Qwen 3.6 Plus strong reasoning (no copilot — hangs on delegation)
+    "atlas": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // ── Sub-Agents ────────────────────────────────────────────────────────────
+
+    // Oracle: verification/judgment — GPT-5.5 strongest reasoning for thorough analysis
+    "oracle": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // Metis: pre-planning analysis — GPT-5.4 strong reasoning for hidden requirements
+    "metis": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus",
+        "zai-coding-plan/glm-5.1"
+      ]
+    },
+
+    // Momus: critic/negative reviewer — GPT-5.4 with high variant for sharp analysis
+    "momus": {
+      "model": "openai/gpt-5.4",
+      "variant": "high",
+      "fallback_models": [
+        "zai-coding-plan/glm-5.1",
+        "alibaba-coding-plan/qwen3.6-plus"
+      ]
+    },
+
+    // Explore: codebase navigation — MiniMax M2.5 strong SWE-bench, fast scanning
+    "explore": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "zai-coding-plan/glm-5-turbo",
+        "openai/gpt-5.4-mini"
+      ]
+    },
+
+    // Librarian: knowledge/search — GLM-5-turbo reliable research
+    "librarian": {
+      "model": "zai-coding-plan/glm-5-turbo",
+      "fallback_models": [
+        "alibaba-coding-plan/glm-5",
+        "openai/gpt-5.4-mini"
+      ]
+    },
+
+    // Sisyphus-Junior: focused task executor — Kimi K2.5 Claude-like execution
+    "sisyphus-junior": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "openai/gpt-5.4-mini",
+        "zai-coding-plan/glm-5-turbo"
+      ]
+    },
+
+    // Multimodal-looker: vision/image analysis — Gemini 3.1 Pro multimodal capable
+    "multimodal-looker": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "alibaba-coding-plan/kimi-k2.5",
+        "zai-coding-plan/glm-5v-turbo"
+      ]
+    }
+  },
+
+  // ── Background Task ─────────────────────────────────────────────────────────
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+
+    // Provider-level concurrency limits — distributes load across 4 providers
+    "providerConcurrency": {
+      "github-copilot": 6,      // Sonnet + Gemini — 2 models
+      "openai": 8,              // GPT-5.x family — high throughput
+      "alibaba-coding-plan": 6, // Qwen/Kimi/MiniMax/GLM — moderate quota
+      "zai-coding-plan": 6      // GLM family — moderate quota
+    },
+
+    // Per-model concurrency — every referenced model gets an entry
+    "modelConcurrency": {
+
+      // ── github-copilot (2 models) ───────────────────────────────────────────
+      "github-copilot/claude-sonnet-4.6": 4,           // Sisyphus — main builder
+      "github-copilot/gemini-3.1-pro-preview": 5,      // Prometheus + multimodal-looker + categories + hephaestus/ultrabrain fallback
+
+      // ── openai ──────────────────────────────────────────────────────────────
+      "openai/gpt-5.5": 3,                             // Oracle + ultrabrain primary + prometheus fallback
+      "openai/gpt-5.4": 5,                             // Momus primary + sisyphus/atlas/multimodal-looker/deep fallback + categories
+      "openai/gpt-5.4-mini": 6,                        // Budget fallback for metis/explore/unspecified-low/librarian/sisyphus-junior/quick
+      "openai/gpt-5.3-codex": 4,                       // Hephaestus primary — code specialist
+
+      // ── alibaba-coding-plan ─────────────────────────────────────────────────
+      "alibaba-coding-plan/qwen3.6-plus": 5,           // Atlas primary + prometheus/ultrabrain/deep/writing/oracle/momus fallback
+      "alibaba-coding-plan/kimi-k2.5": 4,              // Metis + sisyphus-junior primary + artistry/visual-engineering/multimodal-looker/unspecified-high fallback
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 3,   // Hephaestus fallback — strong code gen
+      "alibaba-coding-plan/MiniMax-M2.5": 5,           // Explore + unspecified-low primary + quick fallback
+      "alibaba-coding-plan/glm-5": 3,                  // Librarian fallback
+
+      // ── zai-coding-plan (GLM family only) ───────────────────────────────────
+      "zai-coding-plan/glm-5.1": 4,                    // Deep primary + prometheus/hephaestus/ultrabrain/writing/unspecified-high/oracle/momus fallback
+      "zai-coding-plan/glm-5-turbo": 5,                // Librarian + quick primary + explore/unspecified-low/metis/sisyphus-junior fallback
+      "zai-coding-plan/glm-5v-turbo": 3                // Multimodal-looker + visual-engineering fallback — vision capable
+    }
+  },
+
+  // ── Experimental ────────────────────────────────────────────────────────────
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+
+  // ── Skills ──────────────────────────────────────────────────────────────────
+  "skills": {
+    "sources": [
+      {
+        "path": "~/.config/opencode/skills",
+        "recursive": true
+      }
+    ]
+  },
+
+  "disabled_hooks": [],
+  "auto_update": true,
+
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

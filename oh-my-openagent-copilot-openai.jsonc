@@ -1,0 +1,401 @@
+{
+  // "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOP-LEVEL FEATURES (OmO v3.17.2)
+  // ─────────────────────────────────────────────────────────────────────────
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [400, 429, 503, 529],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CATEGORIES
+  //
+  // 2-PROVIDER STRATEGY:
+  //   github-copilot → visual-engineering, artistry, writing (Gemini models)
+  //                   → core agents Sisyphus/Prometheus (Claude models)
+  //   openai         → ultrabrain, deep, unspecified-high, unspecified-low, quick
+  //                   → ALL sub-agents + Hephaestus + Atlas
+  //
+  // CONSTRAINT: No GPT on GH Copilot. No Opus except Prometheus.
+  // ─────────────────────────────────────────────────────────────────────────
+  "categories": {
+    // Gemini 3.1 Pro via Copilot = OmO default for visual. Best creative reasoning.
+    // OpenAI GPT-5.4 fallback.
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "variant": "medium",
+      "description": "Gemini 3.1 Pro via Copilot excels at visual/frontend tasks. OpenAI GPT-5.4 fallback."
+    },
+
+    // GPT-5.5 = OpenAI flagship for ultrabrain reasoning.
+    // Gemini 3.1 Pro on Copilot fallback.
+    "ultrabrain": {
+      "model": "openai/gpt-5.5",
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "variant": "high",
+      "description": "GPT-5.5 (high) — OpenAI flagship for deep reasoning. Gemini Copilot fallback."
+    },
+
+    // GPT-5.4 = OpenAI general-purpose for deep engineering.
+    // Claude Sonnet 4.6 on Copilot fallback.
+    "deep": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "openai/gpt-5.4-mini"
+      ],
+      "variant": "medium",
+      "description": "GPT-5.4 (medium) — OpenAI general-purpose. Copilot Sonnet fallback."
+    },
+
+    // Gemini 3.1 Pro via Copilot for creative/unconventional approaches.
+    // OmO explicitly recommends Gemini for artistry.
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "variant": "medium",
+      "description": "Gemini 3.1 Pro via Copilot — creative reasoning. OpenAI GPT-5.4 fallback."
+    },
+
+    // GPT-5.4 = OpenAI general-purpose high-capacity.
+    // Claude Sonnet 4.6 on Copilot fallback.
+    "unspecified-high": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "openai/gpt-5.4-mini"
+      ],
+      "variant": "medium",
+      "description": "GPT-5.4 (medium) — OpenAI general-purpose. Copilot Sonnet fallback."
+    },
+
+    // GPT-5.4-mini = OpenAI fast model for moderate tasks.
+    // Claude Sonnet 4.6 on Copilot fallback.
+    "unspecified-low": {
+      "model": "openai/gpt-5.4-mini",
+      "fallback_models": [
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "variant": "low",
+      "description": "GPT-5.4-mini (low) — fast for moderate tasks. Copilot Sonnet fallback."
+    },
+
+    // GPT-5.4-mini = OpenAI fastest model for trivial tasks.
+    // Claude Sonnet 4.6 on Copilot fallback.
+    "quick": {
+      "model": "openai/gpt-5.4-mini",
+      "fallback_models": [
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "variant": "low",
+      "description": "GPT-5.4-mini (low) — fastest for trivial tasks. Copilot Sonnet fallback."
+    },
+
+    // GPT-5.4 = OpenAI for documentation and prose.
+    // Claude Sonnet 4.6 on Copilot fallback.
+    "writing": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "openai/gpt-5.4-mini"
+      ],
+      "variant": "medium",
+      "description": "GPT-5.4 (medium) — OpenAI for prose. Copilot Sonnet fallback."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // AGENTS
+  //
+  // 2-PROVIDER STRATEGY:
+  //   github-copilot → sisyphus, prometheus (Claude ONLY — no GPT!)
+  //                   → Gemini for visual/artistry/writing categories
+  //   openai         → hephaestus, atlas + ALL sub-agents (oracle, metis, momus,
+  //                   → explore, librarian, sisyphus-junior, multimodal-looker)
+  //
+  // HARD CONSTRAINTS:
+  //   ✗ No GPT on GH Copilot (Hephaestus uses OpenAI provider)
+  //   ✗ No Opus except Prometheus
+  //   ✗ No Sonnet for Atlas (Copilot Sonnet hangs on task delegation)
+  //   ✗ Sub-agents must NOT use GH Copilot as primary
+  //   ✓ Visual/artistry/writing categories use Copilot Gemini primary
+  //   ✓ Hephaestus uses OpenAI provider (not Copilot GPT)
+  //
+  // OPENAI MODELS:
+  //   ⭐ GPT-5.4          — Strongest reasoning, general-purpose
+  //   ⭐ GPT-5.3-codex    — Coding specialist, optimized for engineering
+  //   ⭐ GPT-5.4-mini     — Fast, efficient, good balance
+  //   ⭐ GPT-5.1-codex-mini — Fastest, for trivial tasks
+  // ─────────────────────────────────────────────────────────────────────────
+  "agents": {
+
+    // ══════════════════════════════════════════════════════════════════════
+    // CORE AGENTS
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Sisyphus = Claude Sonnet 4.6 on Copilot.
+    // OpenAI GPT-5.4 fallback.
+    "sisyphus": {
+      "model": "github-copilot/claude-sonnet-4.6",
+      "variant": "high",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "The Boss. Claude Sonnet 4.6 on Copilot. OpenAI GPT-5.4 fallback."
+    },
+
+    // Hephaestus = GPT-5.3-codex on OpenAI provider. GPT-ONLY agent.
+    // Gemini 3.1 Pro on Copilot fallback.
+    "hephaestus": {
+      "model": "openai/gpt-5.3-codex",
+      "temperature": 0.05,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. GPT-5.3-codex on OpenAI. Gemini Copilot fallback. GPT-only agent."
+    },
+
+    // Prometheus = Gemini 3.1 Pro on Copilot for planning.
+    // OpenAI GPT-5.5 fallback.
+    "prometheus": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+      "temperature": 0.4,
+      "fallback_models": [
+        "openai/gpt-5.5"
+      ],
+      "description": "The Architect. Gemini 3.1 Pro on Copilot. OpenAI GPT-5.5 fallback."
+    },
+
+    // Atlas = Plan Executor. OpenAI GPT-5.4 primary (NO Copilot Sonnet — hangs).
+    // Gemini 3.1 Pro on Copilot fallback.
+    "atlas": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "The Finisher. GPT-5.4-mini on OpenAI (ATLAS RULE). OpenAI fallback."
+    },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SUB-AGENTS — OpenAI primary, Copilot fallback
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Oracle = high-IQ reasoning. GPT-5.5 on OpenAI.
+    // Copilot Sonnet 4.6 fallback.
+    "oracle": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "temperature": 0.25,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "The Debugger. GPT-5.5 (high) on OpenAI. Copilot Sonnet fallback."
+    },
+
+    // Metis = pre-planning analysis. GPT-5.4-mini on OpenAI.
+    // Copilot Sonnet 4.6 fallback.
+    "metis": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.4,
+      "fallback_models": [
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "Plan Consultant. GPT-5.4-mini on OpenAI (low). Copilot Sonnet fallback."
+    },
+
+    // Momus = plan reviewer. GPT-5.4 on OpenAI.
+    // Copilot Sonnet 4.6 fallback.
+    "momus": {
+      "model": "openai/gpt-5.4",
+      "variant": "high",
+      "temperature": 0.2,
+      "fallback_models": [
+        "openai/gpt-5.4-mini"
+      ],
+      "description": "Plan Reviewer. GPT-5.4 (high) on OpenAI. Copilot Sonnet fallback."
+    },
+
+    // Explore = speed + tool calling. GPT-5.4-mini on OpenAI.
+    // Copilot Sonnet 4.6 fallback.
+    "explore": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.5,
+      "fallback_models": [
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "Utility Runner. GPT-5.4-mini on OpenAI (low). Copilot Sonnet fallback."
+    },
+
+    // Librarian = doc retrieval. GPT-5.4-mini on OpenAI.
+    // Copilot Sonnet 4.6 fallback.
+    "librarian": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.3,
+      "fallback_models": [
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "Research & Documentation. GPT-5.4-mini on OpenAI (low). Copilot Sonnet fallback."
+    },
+
+    // Sisyphus-Junior = task delegation. GPT-5.4-mini on OpenAI.
+    // Copilot Sonnet 4.6 fallback.
+    "sisyphus-junior": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.1-codex-mini"
+      ],
+      "description": "Task Delegate. GPT-5.4-mini on OpenAI (low). Copilot Sonnet fallback."
+    },
+
+    // Multimodal-looker = vision. Gemini on Copilot primary.
+    // OpenAI GPT-5.4 fallback.
+    "multimodal-looker": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "Vision tasks. Gemini 3.1 Pro on Copilot (medium). OpenAI GPT-5.4 fallback."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BACKGROUND TASK CONCURRENCY
+  //
+  // 2-provider distribution:
+  //   github-copilot → 2 core agents (Sisyphus/Prometheus) + Gemini for visual/artistry/writing
+  //   openai         → Hephaestus + Atlas + ALL sub-agents + non-visual categories
+  //
+  // OpenAI has generous limits so sub-agents get plenty of headroom.
+  // ─────────────────────────────────────────────────────────────────────────
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      // Copilot: 2 core agents + Gemini categories — cap to avoid quota burn
+      "github-copilot": 12,
+      // OpenAI: Hephaestus + Atlas + all sub-agents + non-visual categories — generous headroom
+      "openai": 25,
+      "opencode": 10,
+      "anthropic": 5
+    },
+    "modelConcurrency": {
+      // ── Copilot Core Agents ──
+      // Sonnet: sisyphus only
+      "github-copilot/claude-sonnet-4.6": 2,
+      // Gemini: prometheus + multimodal-looker + visual-eng + artistry
+      "github-copilot/gemini-3.1-pro-preview": 5,
+      // ── OpenAI Core Agents ──
+      // GPT-5.5: prometheus fallback + oracle
+      "openai/gpt-5.5": 4,
+      // GPT-5.3-codex: Hephaestus
+      "openai/gpt-5.3-codex": 2,
+      // GPT-5.4: momus + deep + writing + unspecified-high + sisyphus/oracle/hephaestus/ultrabrain fallback + visual-eng/artistry/multimodal-looker fallback
+      "openai/gpt-5.4": 10,
+      // GPT-5.4-mini: metis + explore + librarian + SJ + unspecified-low + quick
+      "openai/gpt-5.4-mini": 10,
+      // GPT-5.1-codex-mini: atlas/metis/explore/librarian/SJ/unspecified-low/quick fallback + atlas/explore/librarian/SJ/unspecified-low/quick additional
+"openai/gpt-5.1-codex-mini": 6
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // EXPERIMENTAL (OmO v3.17.2 features)
+  // ─────────────────────────────────────────────────────────────────────────
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+
+  "skills": {
+    "sources": [
+      { "path": "~/.config/opencode/skills", "recursive": true }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

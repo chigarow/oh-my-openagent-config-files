@@ -1,0 +1,456 @@
+{
+  // "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TOP-LEVEL FEATURES (OmO v3.17.2)
+  // ─────────────────────────────────────────────────────────────────────────
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [400, 429, 503, 529],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CATEGORIES
+  //
+  // 3-PROVIDER STRATEGY:
+  //   github-copilot     → visual-engineering, artistry, writing (Gemini models)
+  //                       → core agents Sisyphus/Prometheus (Claude models)
+  //   alibaba-coding-plan → ultrabrain, deep, unspecified-high, unspecified-low, quick
+  //                        → atlas + ALL sub-agents (PRIMARY — burn Alibaba quota first)
+  //   openai             → FALLBACK for all Alibaba categories/agents
+  //                       → Hephaestus (GPT-only agent)
+  //
+  // CONSTRAINT: No GPT on GH Copilot. No Opus except Prometheus.
+  // ─────────────────────────────────────────────────────────────────────────
+  "categories": {
+    // Gemini 3.1 Pro via Copilot = OmO default for visual. Best creative reasoning.
+    // Copilot primary, Flash + 2.5 Pro fallback (all Copilot).
+    "visual-engineering": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "openai/gpt-5.4"
+      ],
+      "variant": "high",
+      "description": "Gemini 3.1 Pro via Copilot excels at visual/frontend tasks. Copilot fallback."
+    },
+
+    // Qwen3.6 Plus = Deep Thinking + Visual Understanding — strongest thinker on Bailian.
+    // 85.33% LiveCodeBench (best competitive programming on Bailian).
+    // OpenAI GPT-5.4 (strongest fallback) + Bailian Kimi K2.5 (Claude-like) fallbacks.
+    "ultrabrain": {
+      "model": "openai/gpt-5.5",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "Qwen3.6 Plus — Deep Thinking + Visual. Best Bailian model for hard logic."
+    },
+
+    // GLM-5 = agentic engineering champion on Bailian. Arena ELO 1456.
+    // Lowest hallucination among frontier models. Interleaved thinking.
+    // OpenAI GPT-5.3-codex (coding specialist) + Bailian Kimi K2.5 (Claude-like) fallbacks.
+    "deep": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "GLM-5 — lowest hallucination, agentic engineering. OpenAI codex/Kimi fallbacks."
+    },
+
+    // Gemini 3.1 Pro via Copilot for creative/unconventional approaches.
+    // OmO explicitly recommends Gemini for artistry.
+    // Copilot primary, Flash + 2.5 Pro fallback (all Copilot).
+    "artistry": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5",
+        "openai/gpt-5.4"
+      ],
+      "variant": "high",
+      "description": "Gemini 3.1 Pro via Copilot — different reasoning style for creative approaches. Copilot fallback."
+    },
+
+    // Kimi K2.5 = Claude-like behavior (confirmed by OmO). Great all-rounder.
+    // AIME 95.63%, SWE-bench 76.8%. Strong reasoning + tool calling.
+    // OpenAI GPT-5.4 (strongest fallback) + Bailian GLM-5 (reliable) fallbacks.
+    "unspecified-high": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "description": "Kimi K2.5 — Claude-like behavior, great all-rounder for complex work."
+    },
+
+    // MiniMax M2.5 = best SWE-bench on Bailian (80.2%), best tool calling (BFCL 76.8%).
+    // Fast and efficient. OpenAI GPT-5.4-mini (fast) + Bailian GLM-4.7 (fast) fallbacks.
+    "unspecified-low": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "openai/gpt-5.4-mini"
+      ],
+      "description": "MiniMax M2.5 — best SWE-bench (80.2%), fast and smart for moderate tasks."
+    },
+
+    // MiniMax M2.5 = fast + reliable for trivial tasks.
+    // OmO default is gpt-5.4-mini. M2.5 is the best alternative on Bailian.
+    // OpenAI GPT-5.4-mini (fast) + Bailian GLM-4.7 (fast) fallbacks.
+    "quick": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "openai/gpt-5.4-mini"
+      ],
+      "description": "MiniMax M2.5 — fast and reliable for trivial tasks. OpenAI mini/GLM-4.7 fallbacks."
+    },
+
+    // Gemini Flash via Copilot excels at fluent text generation.
+    // Copilot primary, Gemini 2.5 Pro + OpenAI GPT-5.4-mini fallbacks.
+    "writing": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "Gemini 3 Flash via Copilot — fast and fluent for documentation and prose. Copilot + OpenAI fallback."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // AGENTS
+  //
+  // 3-PROVIDER STRATEGY:
+  //   github-copilot     → sisyphus, prometheus (Claude ONLY — no GPT!)
+  //                       → Gemini for visual/artistry/writing categories
+  //   alibaba-coding-plan → atlas + ALL sub-agents (PRIMARY — burn Alibaba quota first)
+  //   openai             → hephaestus (GPT-only agent) + FALLBACK for all Alibaba agents
+  //
+  // HARD CONSTRAINTS:
+  //   ✗ No GPT on GH Copilot (Hephaestus uses OpenAI provider)
+  //   ✗ No Opus except Prometheus
+  //   ✗ No Sonnet for Atlas (Copilot Sonnet hangs on task delegation)
+  //   ✗ Sub-agents must NOT use GH Copilot as primary
+  //   ✓ Visual/artistry/writing categories use Copilot Gemini primary
+  //   ✓ Hephaestus uses OpenAI provider (not Copilot GPT)
+  //
+  // BAILIAN CODING PLAN MODELS:
+  //   ⭐ MiniMax M2.5     — SWE-bench 80.2%, BFCL 76.8% (best tool calling)
+  //   ⭐ Kimi K2.5        — AIME 95.63%, SWE-bench 76.8%, native vision
+  //   ⭐ GLM-5            — Arena ELO 1456, lowest hallucination, interleaved thinking
+  //   ⭐ Qwen3.6 Plus     — LiveCodeBench 85.33%, 1M context, Deep Thinking + Vision
+  //   ⭐ Qwen3 Max        — Deep Thinking, rigorous reasoning
+  //   ⭐ GLM-4.7          — Fast, SOTA coding (SWE-bench 73.8%)
+  // ─────────────────────────────────────────────────────────────────────────
+  "agents": {
+
+    // ══════════════════════════════════════════════════════════════════════
+    // CORE AGENTS — GH Copilot (Claude models ONLY, no GPT)
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Sisyphus = Claude Sonnet 4.6. Claude-ONLY agent (~1,100-line prompt).
+    // OmO default is Opus but Opus reserved for Prometheus only.
+    // Fallbacks: Bailian Kimi K2.5 (Claude-like) → OpenAI GPT-5.5 (flagship).
+    // NO GPT on Copilot — Sisyphus has no-sisyphus-gpt hook.
+    "sisyphus": {
+      "model": "github-copilot/claude-sonnet-4.6",
+      "variant": "high",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "The Boss. Claude Sonnet 4.6 on Copilot. Bailian Kimi/OpenAI GPT-5.5 fallbacks."
+    },
+
+    // Hephaestus = GPT-5.3-codex on OpenAI provider. GPT-ONLY agent.
+    // Uses OpenAI provider (not Copilot GPT) per user constraint.
+    // GPT-5.4 → GPT-5.4-mini fallbacks — all OpenAI provider.
+    "hephaestus": {
+      "model": "openai/gpt-5.3-codex",
+      "temperature": 0.05,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
+      ],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. GPT-5.3-codex on OpenAI provider → GPT-5.4/mini fallbacks. GPT-only agent."
+    },
+
+    // Prometheus = Claude Opus 4.6. The ONLY agent allowed to use Opus.
+    // Dual-prompt agent (auto-switches Claude/GPT prompts at runtime).
+    // Fallbacks: OpenAI GPT-5.5 (flagship) → Bailian Qwen3.6 Plus (Deep Thinking).
+    // NO GPT on Copilot — saves Copilot quota entirely.
+    "prometheus": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "variant": "high",
+      "temperature": 0.4,
+      "fallback_models": [
+        "openai/gpt-5.5",
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "The Architect. Claude Opus (ONLY agent with Opus). OpenAI GPT-5.5/Bailian Qwen3.6 fallbacks."
+    },
+
+    // Atlas = Plan Executor / Master Orchestrator. Qwen3.6 Plus on Bailian.
+    // Copilot Sonnet removed — HTTP/2 GOAWAY, 35-min timeouts, cache miss hangs.
+    // Qwen3.6 Plus = Deep Thinking + Vision + 1M context, reliable tool calling.
+    // OpenAI GPT-5.4 (coding specialist) + Bailian Kimi K2.5 (Claude-like) fallbacks.
+    "atlas": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "The Finisher. Qwen3.6 Plus — reliable orchestrator (Deep Thinking + 1M ctx). OpenAI GPT-5.4/Bailian Kimi fallbacks."
+    },
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SUB-AGENTS — alibaba-coding-plan PRIMARY, OpenAI FALLBACK
+    //
+    // Model diversity ensures no single-point-of-failure:
+    //   oracle           → Qwen3.6 Plus (Deep Thinking, best LiveCodeBench)
+    //   momus            → Qwen3 Max (Deep Thinking, different from Oracle)
+    //   metis            → Kimi K2.5 (Claude-like planner)
+    //   sisyphus-junior  → Kimi K2.5 (Claude-like task handler)
+    //   explore          → MiniMax M2.5 (best tool calling + SWE-bench)
+    //   librarian        → GLM-5 (lowest hallucination, reliable research)
+    //   multimodal-looker→ Kimi K2.5 (native vision)
+    // ══════════════════════════════════════════════════════════════════════
+
+    // Oracle = high-IQ reasoning for debugging/architecture consultation.
+    // Qwen3.6 Plus (high variant) = Deep Thinking + Vision + 1M context — strongest thinker on Bailian.
+    // LiveCodeBench 85.33% (best on Bailian), good systematic debugging.
+    // OpenAI GPT-5.5 (flagship fallback) + Bailian GLM-5 (lowest hallucination) fallbacks.
+    "oracle": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "temperature": 0.25,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "The Debugger. Qwen3.6 Plus (high) — Deep Thinking + Vision. OpenAI GPT-5.5/Bailian GLM-5 fallbacks."
+    },
+
+    // Metis = pre-planning analysis, plan gap detection.
+    // Kimi K2.5 = confirmed Claude-like by OmO. AIME 95.63%, native vision.
+    // OpenAI GPT-5.4-mini (fast) + Bailian GLM-5 (reliable) fallbacks.
+    "metis": {
+      "model": "openai/gpt-5.4",
+      "temperature": 0.4,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "Plan Consultant. Kimi K2.5 (Claude-like) for plan gap analysis. OpenAI mini/Bailian GLM-5 fallbacks."
+    },
+
+    // Momus = ruthless plan reviewer/verifier.
+    // Qwen3 Max (high variant) = Deep Thinking — rigorous verification.
+    // Different model from Oracle (Qwen3.6 Plus) — avoids single-point-of-failure.
+    // OpenAI GPT-5.4 (strongest) + Bailian Kimi K2.5 (Claude-like) fallbacks.
+    "momus": {
+      "model": "openai/gpt-5.4",
+      "variant": "high",
+      "temperature": 0.2,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "Plan Reviewer. Qwen3 Max (high) — Deep Thinking for rigorous verification. OpenAI GPT-5.4/Kimi fallbacks."
+    },
+
+    // Explore = speed + tool calling is everything. Fire 10+ in parallel.
+    // MiniMax M2.5 = best tool calling (BFCL 76.8%) + best SWE-bench (80.2%).
+    // Fast enough for utility scanning. Completes tasks in 20% fewer rounds.
+    // OpenAI GPT-5.4-mini (fast) + Bailian GLM-4.7 (fast backup) fallbacks.
+    "explore": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.5,
+      "fallback_models": [
+        "alibaba-coding-plan/MiniMax-M2.5"
+      ],
+      "description": "Utility Runner. MiniMax M2.5 — best tool calling + SWE-bench. OpenAI mini/GLM-4.7 fallbacks."
+    },
+
+    // Librarian = doc retrieval, research, large context processing.
+    // GLM-5 = lowest hallucination among frontier models — ideal for factual research.
+    // Arena ELO 1456 (highest on Bailian), reliable doc synthesis.
+    // OpenAI GPT-5.4-mini (fast) + Bailian Kimi K2.5 (vision for doc screenshots) fallbacks.
+    "librarian": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.3,
+      "fallback_models": [
+        "alibaba-coding-plan/glm-5"
+      ],
+      "description": "Research & Documentation. GLM-5 — lowest hallucination, reliable research. OpenAI mini/Kimi fallbacks."
+    },
+
+    // Sisyphus-Junior = task delegation handler. Executes category-delegated tasks.
+    // Kimi K2.5 = closest Claude-like on Bailian. AIME 95.63%, SWE-bench 76.8%.
+    // OpenAI GPT-5.4-mini (fast) + Bailian MiniMax M2.5 (best SWE-bench) fallbacks.
+    "sisyphus-junior": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.1,
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "description": "Task Delegate. Kimi K2.5 (Claude-like) on Bailian. OpenAI mini/MiniMax fallbacks."
+    },
+
+    // Multimodal-looker = vision-capable model required.
+    // Kimi K2.5 = native multimodal (pre-trained on 15T text+vision tokens).
+    // Only vision-capable model on Bailian Coding Plan besides Qwen3.6 Plus.
+    // OpenAI GPT-5.4 (vision) + Bailian Qwen3.6 Plus (vision + 1M context) fallbacks.
+    "multimodal-looker": {
+      "model": "github-copilot/gemini-3.1-pro-preview",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4",
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "description": "Vision tasks. Kimi K2.5 — native multimodal. OpenAI GPT-5.4/Qwen3.6 Plus fallbacks."
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // BACKGROUND TASK CONCURRENCY
+  //
+  // 3-provider distribution:
+  //   github-copilot     → 2 core agents (Sisyphus/Prometheus) + Gemini for visual/artistry/writing
+  //   alibaba-coding-plan → Atlas + ALL sub-agents + non-visual categories (PRIMARY)
+  //   openai             → Hephaestus + FALLBACK for all Alibaba agents/categories
+  //
+  // Bailian Coding Plan has generous limits so sub-agents get plenty of headroom.
+  // OpenAI as fallback ensures reliability when Alibaba quota exhausted.
+  // ─────────────────────────────────────────────────────────────────────────
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      // Copilot: 2 core agents + Gemini categories — cap to avoid quota burn
+      "github-copilot": 12,
+      // Bailian: Atlas + all sub-agents + non-visual categories — generous headroom (PRIMARY)
+      "alibaba-coding-plan": 25,
+      // OpenAI: Hephaestus + fallback for all Alibaba agents/categories
+      "openai": 15,
+      "opencode": 10,
+      "anthropic": 5
+    },
+    "modelConcurrency": {
+      // ── Copilot Core Agents ──
+      // Opus: ONLY prometheus — hard cap at 1
+      "github-copilot/claude-opus-4.6": 1,
+      // Sonnet: sisyphus only
+      "github-copilot/claude-sonnet-4.6": 2,
+      // Gemini via Copilot: visual/artistry/writing categories
+      "github-copilot/gemini-3.1-pro-preview": 5,
+      "github-copilot/gemini-3-flash-preview": 1,
+      "github-copilot/gemini-2.5-pro": 1,
+      // ── OpenAI Core Agents ──
+      // GPT-5.3-codex: Hephaestus only
+      "openai/gpt-5.3-codex": 2,
+      // GPT-5.5: Sisyphus/Prometheus fallback + Oracle fallback (flagship)
+      "openai/gpt-5.5": 6,
+      // GPT-5.4: Atlas fallback + Momus fallback + Multimodal-looker fallback + ultrabrain fallback + unspecified-high fallback
+      "openai/gpt-5.4": 6,
+      // GPT-5.4-mini: Metis fallback + Explore fallback + Librarian fallback + Sisyphus-junior fallback + unspecified-low fallback + quick fallback + writing fallback
+      "openai/gpt-5.4-mini": 10,
+      // ── Bailian Sub-Agents ──
+      // MiniMax M2.5: explore + unspecified-low + quick
+      "alibaba-coding-plan/MiniMax-M2.5": 12,
+      // Kimi K2.5: metis + sisyphus-junior + multimodal-looker + ultrabrain fallback + deep fallback + unspecified-high fallback
+      "alibaba-coding-plan/kimi-k2.5": 8,
+      // GLM-5: deep + librarian + oracle fallback + metis fallback + momus fallback + unspecified-high fallback
+      "alibaba-coding-plan/glm-5": 8,
+      // Qwen3.6 Plus: atlas + oracle + ultrabrain + prometheus fallback + multimodal-looker fallback
+      "alibaba-coding-plan/qwen3.6-plus": 6,
+      // Qwen3 Max: momus only
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 4,
+      // GLM-4.7: explore fallback + unspecified-low fallback + quick fallback
+      "alibaba-coding-plan/glm-4.7": 6
+    }
+  },
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // EXPERIMENTAL (OmO v3.17.2 features)
+  // ─────────────────────────────────────────────────────────────────────────
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+
+  "skills": {
+    "sources": [
+      { "path": "~/.config/opencode/skills", "recursive": true }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

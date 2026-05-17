@@ -1,0 +1,4 @@
+# Only include oh-my-openagent config files
+*
+!.gitignore
+!oh-my-openagent*.jsonc

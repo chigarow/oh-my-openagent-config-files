@@ -1,0 +1,228 @@
+{
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [
+      400,
+      429,
+      503,
+      529
+    ],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [],
+      "variant": "high",
+      "description": "GPT-5.4 \u2014 value-tier vision + creative reasoning for frontend tasks."
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [],
+      "description": "GPT-5.4 \u2014 value-tier reasoning for hard logic problems."
+    },
+    "deep": {
+      "model": "openai/gpt-5.3-codex",
+      "fallback_models": [],
+      "description": "GPT-5.3-codex \u2014 128K output agentic coding for autonomous work."
+    },
+    "artistry": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [],
+      "variant": "high",
+      "description": "GPT-5.4 \u2014 value-tier creative reasoning for unconventional approaches."
+    },
+    "unspecified-high": {
+      "model": "openai/gpt-5.4",
+      "fallback_models": [],
+      "description": "GPT-5.4 \u2014 value-tier all-purpose for complex work."
+    },
+    "unspecified-low": {
+      "model": "openai/gpt-5.4-mini",
+      "fallback_models": [],
+      "description": "GPT-5.4-mini \u2014 budget tier for moderate tasks."
+    },
+    "quick": {
+      "model": "openai/gpt-5.4-mini",
+      "fallback_models": [],
+      "description": "GPT-5.4-mini \u2014 fast and budget for trivial tasks."
+    },
+    "writing": {
+      "model": "openai/gpt-5.4-mini",
+      "fallback_models": [],
+      "description": "GPT-5.4-mini \u2014 fast and fluent for documentation and prose."
+    }
+  },
+  "agents": {
+    "sisyphus": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "The Boss. GPT-5.5 (max) \u2014 flagship, quality cascades. gpt-5.4/gpt-5.4-mini fallbacks."
+    },
+    "hephaestus": {
+      "model": "openai/gpt-5.3-codex",
+      "temperature": 0.05,
+      "fallback_models": [],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. GPT-5.3-codex \u2014 128K output agentic coding. gpt-5.4/gpt-5.4-mini fallbacks."
+    },
+    "prometheus": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "temperature": 0.4,
+      "fallback_models": [],
+      "description": "The Architect. GPT-5.5 (max) \u2014 flagship for permanent decisions. gpt-5.4/gpt-5.3-codex fallbacks."
+    },
+    "atlas": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "The Finisher. GPT-5.4 \u2014 value-tier orchestrator (1,050K ctx). gpt-5.5/gpt-5.4-mini fallbacks."
+    },
+    "oracle": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "temperature": 0.25,
+      "fallback_models": [],
+      "description": "The Debugger. GPT-5.5 (high) \u2014 flagship for debugging. gpt-5.4/gpt-5.3-codex fallbacks."
+    },
+    "metis": {
+      "model": "openai/gpt-5.4",
+      "temperature": 0.4,
+      "fallback_models": [],
+      "description": "Plan Consultant. GPT-5.4 \u2014 value-tier plan gap analysis. gpt-5.5/gpt-5.4-mini fallbacks."
+    },
+    "momus": {
+      "model": "openai/gpt-5.4",
+      "variant": "high",
+      "temperature": 0.2,
+      "fallback_models": [],
+      "description": "Plan Reviewer. GPT-5.4 (high) \u2014 value-tier verification. gpt-5.5/gpt-5.3-codex fallbacks."
+    },
+    "explore": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.5,
+      "fallback_models": [],
+      "description": "Utility Runner. GPT-5.4-mini \u2014 budget for parallel scanning. gpt-5.1-codex-mini/gpt-5.4 fallbacks."
+    },
+    "librarian": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.3,
+      "fallback_models": [],
+      "description": "Research & Documentation. GPT-5.4-mini \u2014 budget for research. gpt-5.1-codex-mini/gpt-5.4 fallbacks."
+    },
+    "sisyphus-junior": {
+      "model": "openai/gpt-5.4-mini",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "Task Delegate. GPT-5.4-mini \u2014 budget for delegation. gpt-5.1-codex-mini/gpt-5.4 fallbacks."
+    },
+    "multimodal-looker": {
+      "model": "openai/gpt-5.4",
+      "temperature": 0.1,
+      "fallback_models": [],
+      "description": "Vision tasks. GPT-5.4 \u2014 value-tier vision. gpt-5.5/gpt-5.4-mini fallbacks."
+    }
+  },
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      "openai": 30,
+      "opencode": 10,
+      "anthropic": 5
+    },
+    "modelConcurrency": {
+      "openai/gpt-5.5": 6,
+      "openai/gpt-5.4": 10,
+      "openai/gpt-5.4-mini": 12,
+      "openai/gpt-5.3-codex": 6,
+      "openai/gpt-5.1-codex-mini": 4
+    }
+  },
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+  "skills": {
+    "sources": [
+      {
+        "path": "~/.config/opencode/skills",
+        "recursive": true
+      }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

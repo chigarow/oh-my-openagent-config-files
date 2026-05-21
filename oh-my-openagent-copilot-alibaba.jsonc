@@ -62,29 +62,29 @@
         "alibaba-coding-plan/kimi-k2.5"
       ],
       "variant": "medium",
-      "description": "Gemini 3.1 Pro via Copilot excels at visual/frontend tasks. Kimi K2.5 fallback."
+      "description": "Gemini 3.1 Pro on Copilot — visual/frontend. Kimi K2.5 (native vision) fallback."
     },
 
     // Claude Sonnet 4.6 on Copilot for ultrabrain reasoning.
     // Qwen3.5 Plus fallback (Deep Thinking + Vision).
     "ultrabrain": {
-      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
       "fallback_models": [
-        "alibaba-coding-plan/qwen3-max-2026-01-23"
+        "alibaba-coding-plan/qwen3.6-plus"
       ],
       "variant": "high",
-      "description": "Claude Sonnet 4.6 (high) — Copilot primary. Qwen3.5 Plus Deep Thinking fallback."
+      "description": "Qwen3 Max — rigorous deep reasoning. Qwen3.5 Plus (Deep Thinking) fallback."
     },
 
     // Claude Sonnet 4.6 on Copilot for deep engineering.
     // Qwen3.5 Plus fallback (Deep Thinking).
     "deep": {
-      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "model": "alibaba-coding-plan/qwen3.6-plus",
       "fallback_models": [
-        "alibaba-coding-plan/glm-5"
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
       ],
       "variant": "medium",
-      "description": "Claude Sonnet 4.6 (medium) — Copilot primary. Qwen3.5 Plus fallback."
+      "description": "Qwen3.5 Plus — LiveCodeBench 85%, Deep Thinking, 1M ctx. Qwen3 Max fallback."
     },
 
     // Gemini 3.1 Pro via Copilot for creative/unconventional approaches.
@@ -95,7 +95,7 @@
         "alibaba-coding-plan/kimi-k2.5"
       ],
       "variant": "medium",
-      "description": "Gemini 3.1 Pro via Copilot — creative reasoning. Kimi K2.5 fallback."
+      "description": "Gemini 3.1 Pro on Copilot — creative reasoning. Kimi K2.5 fallback."
     },
 
     // Claude Sonnet 4.6 on Copilot for complex general work.
@@ -103,10 +103,10 @@
     "unspecified-high": {
       "model": "alibaba-coding-plan/kimi-k2.5",
       "fallback_models": [
-        "alibaba-coding-plan/qwen3.5-plus"
+        "alibaba-coding-plan/qwen3.6-plus"
       ],
       "variant": "medium",
-      "description": "Claude Sonnet 4.6 (medium) — Copilot primary. Kimi K2.5 Claude-like fallback."
+      "description": "Kimi K2.5 — Claude-like, AIME 95%, SWE-bench 76.8%. Qwen3.5 Plus fallback."
     },
 
     // Claude Sonnet 4.6 on Copilot for moderate tasks.
@@ -114,10 +114,10 @@
     "unspecified-low": {
       "model": "alibaba-coding-plan/MiniMax-M2.5",
       "fallback_models": [
-        "alibaba-coding-plan/glm-4.7"
+        "alibaba-coding-plan/glm-5"
       ],
       "variant": "low",
-      "description": "Claude Sonnet 4.6 (low) — Copilot primary. MiniMax M2.5 fast fallback."
+      "description": "MiniMax M2.5 — SWE-bench 80.2%, fast. GLM-5 fallback."
     },
 
     // Claude Sonnet 4.6 on Copilot for trivial tasks.
@@ -125,21 +125,21 @@
     "quick": {
       "model": "alibaba-coding-plan/MiniMax-M2.5",
       "fallback_models": [
-        "alibaba-coding-plan/glm-4.7"
+        "alibaba-coding-plan/glm-5"
       ],
       "variant": "low",
-      "description": "Claude Sonnet 4.6 (low) — Copilot primary. MiniMax M2.5 fast fallback."
+      "description": "MiniMax M2.5 — fastest, BFCL 76.8% tool calling. GLM-5 fallback."
     },
 
     // Claude Sonnet 4.6 on Copilot for documentation and prose.
     // Qwen3.5 Plus fallback (Deep Thinking).
     "writing": {
-      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "model": "alibaba-coding-plan/qwen3.6-plus",
       "fallback_models": [
         "alibaba-coding-plan/kimi-k2.5"
       ],
       "variant": "medium",
-      "description": "Claude Sonnet 4.6 (medium) — Copilot primary. Qwen3.5 Plus fallback."
+      "description": "Qwen3.5 Plus — Deep Thinking for prose. Kimi K2.5 fallback."
     }
   },
 
@@ -167,7 +167,7 @@
   //   ⭐ GLM-5            — Arena ELO 1456, lowest hallucination, interleaved thinking
   //   ⭐ Qwen3.5 Plus     — LiveCodeBench 85.33%, 1M context, Deep Thinking + Vision
   //   ⭐ Qwen3 Max        — Deep Thinking, rigorous reasoning
-  //   ⭐ GLM-4.7          — Fast, SOTA coding (SWE-bench 73.8%)
+  //   ⭐ GLM-5          — Fast, SOTA coding (SWE-bench 73.8%)
   //   ❌ GLM-5.1          — NOT on Bailian Coding Plan
   //   ❌ DeepSeek V4-Pro    — NOT on Bailian Coding Plan
   // ─────────────────────────────────────────────────────────────────────────
@@ -186,46 +186,46 @@
       "fallback_models": [
         "alibaba-coding-plan/kimi-k2.5"
       ],
-      "description": "The Boss. Claude Sonnet 4.6 on Copilot. Kimi K2.5 Claude-like fallback."
+      "description": "The Boss. Claude Sonnet 4.6 on Copilot. Kimi K2.5 (Claude-like) fallback."
     },
 
     // Hephaestus = GPT-5.3-codex. GPT-ONLY agent.
     // Qwen3 Max fallback on Bailian.
     "hephaestus": {
-      "model": "github-copilot/gpt-5.3-codex",
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
       "temperature": 0.05,
       "fallback_models": [
-        "alibaba-coding-plan/qwen3-max-2026-01-23"
+        "alibaba-coding-plan/qwen3.6-plus"
       ],
       "permission": {
         "edit": "allow",
         "bash": "allow",
         "webfetch": "allow"
       },
-      "description": "The Worker. GPT-5.3-codex on Copilot. Qwen3 Max fallback. GPT-only agent."
+      "description": "The Worker. Qwen3 Max — rigorous coding. Qwen3.5 Plus fallback."
     },
 
     // Prometheus = Gemini 3.1 Pro on Copilot for planning.
     // Qwen3.5 Plus fallback (Deep Thinking).
     "prometheus": {
-      "model": "github-copilot/gemini-3.1-pro-preview",
+      "model": "github-copilot/claude-opus-4.6",
       "variant": "high",
       "temperature": 0.4,
       "fallback_models": [
-        "alibaba-coding-plan/qwen3.5-plus"
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
       ],
-      "description": "The Architect. Gemini 3.1 Pro on Copilot. Qwen3.5 Plus fallback."
+      "description": "The Architect. Claude Opus 4.6 on Copilot. Qwen3 Max (rigorous) fallback."
     },
 
     // Atlas = Plan Executor. Qwen3.5 Plus on Bailian primary (NO Copilot Sonnet — hangs).
     // Gemini 3.1 Pro on Copilot fallback.
     "atlas": {
-      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "model": "alibaba-coding-plan/qwen3.6-plus",
       "temperature": 0.1,
       "fallback_models": [
         "alibaba-coding-plan/kimi-k2.5"
       ],
-      "description": "The Finisher. Qwen3.5 Plus on Bailian primary. Gemini Copilot fallback."
+      "description": "The Finisher. Qwen3.5 Plus — Deep Thinking executor. Kimi K2.5 fallback."
     },
 
     // ══════════════════════════════════════════════════════════════════════
@@ -235,36 +235,37 @@
     // Oracle = high-IQ reasoning. Copilot Sonnet primary.
     // Qwen3.5 Plus fallback (Deep Thinking).
     "oracle": {
-      "model": "alibaba-coding-plan/qwen3.5-plus",
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
       "variant": "high",
       "temperature": 0.25,
       "fallback_models": [
-        "alibaba-coding-plan/glm-5"
+        "alibaba-coding-plan/qwen3.6-plus"
       ],
-      "description": "The Debugger. Copilot Sonnet 4.6 (high). Qwen3.5 Plus fallback."
+      "description": "The Debugger. Qwen3 Max — rigorous deep debug. Qwen3.5 Plus fallback."
     },
 
     // Metis = pre-planning analysis. Copilot Sonnet primary.
     // Kimi K2.5 fallback (Claude-like).
     "metis": {
-      "model": "alibaba-coding-plan/kimi-k2.5",
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
       "temperature": 0.4,
       "fallback_models": [
-        "alibaba-coding-plan/glm-5"
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
       ],
-      "description": "Plan Consultant. Copilot Sonnet 4.6 (low). Kimi K2.5 fallback."
+      "description": "Plan Consultant. Qwen3.5 Plus — Deep Thinking + 1M ctx. Qwen3 Max fallback."
     },
 
     // Momus = plan reviewer. Copilot Sonnet primary.
     // Qwen3.5 Plus fallback (Deep Thinking).
     "momus": {
-      "model": "alibaba-coding-plan/kimi-k2.5",
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
       "variant": "high",
       "temperature": 0.2,
       "fallback_models": [
-        "alibaba-coding-plan/qwen3.5-plus"
+        "alibaba-coding-plan/qwen3.6-plus"
       ],
-      "description": "Plan Reviewer. Copilot Sonnet 4.6 (high). Qwen3.5 Plus fallback."
+      "description": "Plan Reviewer. Qwen3 Max — rigorous review. Qwen3.5 Plus fallback."
     },
 
     // Explore = speed + tool calling. Copilot Sonnet primary.
@@ -273,9 +274,9 @@
       "model": "alibaba-coding-plan/MiniMax-M2.5",
       "temperature": 0.5,
       "fallback_models": [
-        "alibaba-coding-plan/glm-4.7"
+        "alibaba-coding-plan/glm-5"
       ],
-      "description": "Utility Runner. Copilot Sonnet 4.6 (low). MiniMax M2.5 fallback."
+      "description": "Utility Runner. MiniMax M2.5 — BFCL 76.8% best tool calling. GLM-5 fallback."
     },
 
     // Librarian = research. Copilot Sonnet primary.
@@ -284,31 +285,32 @@
       "model": "alibaba-coding-plan/glm-5",
       "temperature": 0.3,
       "fallback_models": [
-        "alibaba-coding-plan/kimi-k2.5"
+        "alibaba-coding-plan/qwen3.6-plus"
       ],
-      "description": "Research & Documentation. Copilot Sonnet 4.6 (low). GLM-5 fallback."
+      "description": "Research & Documentation. GLM-5 — lowest hallucination. Qwen3.5 Plus fallback."
     },
 
     // Sisyphus-Junior = task delegation. Copilot Sonnet primary.
     // Kimi K2.5 fallback (Claude-like).
     "sisyphus-junior": {
-      "model": "alibaba-coding-plan/kimi-k2.5",
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
       "temperature": 0.1,
       "fallback_models": [
-        "alibaba-coding-plan/MiniMax-M2.5"
+        "alibaba-coding-plan/kimi-k2.5"
       ],
-      "description": "Task Delegate. Copilot Sonnet 4.6 (low). Kimi K2.5 fallback."
+      "description": "Task Delegate. Qwen3.5 Plus — Deep Thinking strong delegation. Kimi K2.5 fallback."
     },
 
     // Multimodal-looker = vision. Gemini on Copilot primary.
     // Kimi K2.5 fallback (native multimodal).
     "multimodal-looker": {
-      "model": "github-copilot/gemini-3.1-pro-preview",
+      "model": "alibaba-coding-plan/kimi-k2.5",
       "temperature": 0.1,
       "fallback_models": [
-        "alibaba-coding-plan/kimi-k2.5"
+        "alibaba-coding-plan/qwen3.6-plus"
       ],
-      "description": "Vision tasks. Gemini 3.1 Pro on Copilot (medium). Kimi K2.5 fallback."
+      "description": "Vision tasks. Kimi K2.5 — native multimodal. Qwen3.5 Plus (Vision) fallback."
     }
   },
 
@@ -338,24 +340,21 @@
       "anthropic": 5
     },
     "modelConcurrency": {
-      // ── Copilot Core Agents ──
-      // Sonnet: sisyphus + oracle + momus + all sub-agents + ultrabrain + deep + writing
-      "github-copilot/claude-sonnet-4.6": 10,
-      // GPT: hephaestus only (GPT exception)
-      "github-copilot/gpt-5.3-codex": 2,
-      // Gemini: prometheus + atlas fallback + multimodal-looker + visual-eng + artistry
-      "github-copilot/gemini-3.1-pro-preview": 6,
-      // ── Bailian Models ──
-      // Kimi K2.5: sisyphus fallback + multimodal-looker fallback + visual-eng fallback + artistry fallback + unspecified-high fallback + metis fallback + SJ fallback
+      // ── Copilot (only 4 spots: sisyphus, prometheus, visual-eng, artistry) ──
+      "github-copilot/claude-sonnet-4.6": 4,
+      "github-copilot/claude-opus-4.6": 2,
+      "github-copilot/gemini-3.1-pro-preview": 4,
+      // ── Alibaba Models ──
+      // qwen3-max: hephaestus + oracle + momus + ultrabrain + prometheus-fb + metis-fb
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 8,
+      // qwen3.6-plus: atlas + metis + sisyphus-junior + deep + writing + many fallbacks
+      "alibaba-coding-plan/qwen3.6-plus": 10,
+      // kimi-k2.5: multimodal-looker + unspecified-high + many fallbacks
       "alibaba-coding-plan/kimi-k2.5": 8,
-      // Qwen3.5 Plus: atlas + oracle fallback + prometheus fallback + ultrabrain fallback + deep fallback + writing fallback + momus fallback
-      "alibaba-coding-plan/qwen3.5-plus": 6,
-      // Qwen3 Max: hephaestus fallback
-      "alibaba-coding-plan/qwen3-max-2026-01-23": 4,
-      // GLM-5: librarian
-      "alibaba-coding-plan/glm-5": 4,
-      // MiniMax M2.5: explore + unspecified-low + quick
-      "alibaba-coding-plan/MiniMax-M2.5": 6
+      // MiniMax-M2.5: explore + unspecified-low + quick
+      "alibaba-coding-plan/MiniMax-M2.5": 6,
+      // glm-5: librarian + fallbacks
+      "alibaba-coding-plan/glm-5": 4
     }
   },
 

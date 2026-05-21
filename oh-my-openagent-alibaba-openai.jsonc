@@ -1,0 +1,275 @@
+{
+  "hashline_edit": true,
+  "new_task_system_enabled": true,
+  "model_fallback": true,
+  "disabled_skills": ["git-master"],
+  "git_master": {
+    "commit_footer": false,
+    "include_co_authored_by": false,
+    "git_env_prefix": "GIT_MASTER=1"
+  },
+  "model_capabilities": {
+    "enabled": true,
+    "auto_refresh_on_start": true,
+    "refresh_timeout_ms": 15000
+  },
+  "sisyphus_agent": {
+    "disabled": false,
+    "planner_enabled": true,
+    "replace_plan": true,
+    "default_builder_enabled": false
+  },
+  "sisyphus": {
+    "tasks": {
+      "storage_path": ".sisyphus/tasks",
+      "claude_code_compat": false
+    }
+  },
+  "runtime_fallback": {
+    "enabled": true,
+    "retry_on_errors": [
+      400,
+      429,
+      503,
+      529
+    ],
+    "max_fallback_attempts": 3,
+    "cooldown_seconds": 30,
+    "timeout_seconds": 120,
+    "notify_on_fallback": true
+  },
+  "categories": {
+    "visual-engineering": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "variant": "high",
+      "description": "Kimi K2.5 — native vision + creative coding. GPT-5.4 fallback."
+    },
+    "ultrabrain": {
+      "model": "openai/gpt-5.5-pro",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
+      ],
+      "variant": "high",
+      "description": "GPT-5.5 Pro — max compute for hardest logic. Qwen3 Max fallback."
+    },
+    "deep": {
+      "model": "openai/gpt-5.5",
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "variant": "high",
+      "description": "GPT-5.5 — full agentic + deep research (SWE-Pro 58.6%). Qwen3.6 Plus fallback."
+    },
+    "artistry": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "variant": "high",
+      "description": "Kimi K2.5 — vision + creative coding. GPT-5.4 fallback."
+    },
+    "unspecified-high": {
+      "model": "openai/gpt-5.5",
+      "fallback_models": [
+        "alibaba-coding-plan/kimi-k2.5"
+      ],
+      "variant": "high",
+      "description": "GPT-5.5 — best all-rounder (FrontierMath 51.7%). Kimi K2.5 fallback."
+    },
+    "unspecified-low": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "openai/gpt-5.3-codex-spark"
+      ],
+      "description": "MiniMax M2.5 — SWE 80.2%, 100 tok/s. Codex Spark fallback."
+    },
+    "quick": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "fallback_models": [
+        "openai/gpt-5.3-codex-spark"
+      ],
+      "description": "MiniMax M2.5 — fastest tool calling (BFCL 76.8). Codex Spark fallback."
+    },
+    "writing": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "Qwen3.6 Plus — deep thinking + 1M ctx for prose. GPT-5.4 fallback."
+    }
+  },
+  "agents": {
+    "sisyphus": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "variant": "high",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "The Boss. Kimi K2.5 — Claude-like agentic coding (SWE 76.8, vision). GPT-5.4 fallback."
+    },
+    "hephaestus": {
+      "model": "alibaba-coding-plan/qwen3-max-2026-01-23",
+      "temperature": 0.05,
+      "fallback_models": [
+        "openai/gpt-5.3-codex"
+      ],
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "webfetch": "allow"
+      },
+      "description": "The Worker. Qwen3 Max — AIME 100, deepest reasoning. GPT-5.3-codex fallback (SWE-Verified 85%)."
+    },
+    "prometheus": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "variant": "high",
+      "temperature": 0.4,
+      "fallback_models": [
+        "openai/gpt-5.5"
+      ],
+      "description": "The Architect. Qwen3.6 Plus — AIME 95.3, 1M ctx, deep thinking. GPT-5.5 fallback."
+    },
+    "atlas": {
+      "model": "alibaba-coding-plan/qwen3.6-plus",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "The Finisher. Qwen3.6 Plus — 1M ctx orchestrator, deep thinking. GPT-5.4 fallback."
+    },
+    "oracle": {
+      "model": "openai/gpt-5.5",
+      "variant": "high",
+      "temperature": 0.25,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3-max-2026-01-23"
+      ],
+      "description": "The Debugger. GPT-5.5 — best agentic + full tools (FrontierMath 51.7%). Qwen3 Max fallback."
+    },
+    "metis": {
+      "model": "openai/gpt-5.5",
+      "temperature": 0.4,
+      "fallback_models": [
+        "alibaba-coding-plan/qwen3.6-plus"
+      ],
+      "description": "Plan Consultant. GPT-5.5 — strong reasoning + full tool access. Qwen3.6 Plus fallback."
+    },
+    "momus": {
+      "model": "openai/gpt-5.5-pro",
+      "variant": "high",
+      "temperature": 0.2,
+      "fallback_models": [
+        "alibaba-coding-plan/glm-5"
+      ],
+      "description": "Plan Reviewer. GPT-5.5 Pro — max compute for rigorous verification. GLM-5 fallback."
+    },
+    "explore": {
+      "model": "alibaba-coding-plan/MiniMax-M2.5",
+      "temperature": 0.5,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "Utility Runner. MiniMax M2.5 — BFCL 76.8, 100 tok/s, SWE 80.2. GPT-5.4 fallback."
+    },
+    "librarian": {
+      "model": "alibaba-coding-plan/glm-5",
+      "temperature": 0.3,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "Research & Documentation. GLM-5 — lowest hallucination (τ²-Bench 89.7). GPT-5.4 fallback."
+    },
+    "sisyphus-junior": {
+      "model": "openai/gpt-5.3-codex-spark",
+      "temperature": 0.1,
+      "fallback_models": [
+        "alibaba-coding-plan/MiniMax-M2.5"
+      ],
+      "description": "Task Delegate. Codex Spark — >1000 tok/s, quick bursts. MiniMax M2.5 fallback."
+    },
+    "multimodal-looker": {
+      "model": "alibaba-coding-plan/kimi-k2.5",
+      "temperature": 0.1,
+      "fallback_models": [
+        "openai/gpt-5.4"
+      ],
+      "description": "Vision tasks. Kimi K2.5 — native multimodal, 256K ctx. GPT-5.4 fallback."
+    }
+  },
+  "background_task": {
+    "defaultConcurrency": 5,
+    "staleTimeoutMs": 180000,
+    "circuitBreaker": {
+      "enabled": true,
+      "maxToolCalls": 200,
+      "consecutiveThreshold": 10
+    },
+    "providerConcurrency": {
+      "alibaba-coding-plan": 30,
+      "openai": 20,
+      "opencode": 10
+    },
+    "modelConcurrency": {
+      "openai/gpt-5.5": 4,
+      "openai/gpt-5.5-pro": 2,
+      "openai/gpt-5.5-fast": 4,
+      "openai/gpt-5.4": 10,
+      "openai/gpt-5.3-codex": 2,
+      "openai/gpt-5.3-codex-spark": 8,
+      "alibaba-coding-plan/kimi-k2.5": 10,
+      "alibaba-coding-plan/qwen3.6-plus": 8,
+      "alibaba-coding-plan/qwen3-max-2026-01-23": 4,
+      "alibaba-coding-plan/MiniMax-M2.5": 12,
+      "alibaba-coding-plan/glm-5": 8
+    }
+  },
+  "experimental": {
+    "task_system": true,
+    "preemptive_compaction": true,
+    "aggressive_truncation": true,
+    "dynamic_context_pruning": {
+      "enabled": true,
+      "notification": "detailed",
+      "turn_protection": {
+        "enabled": true,
+        "turns": 10
+      },
+      "strategies": {
+        "deduplication": {
+          "enabled": true
+        },
+        "supersede_writes": {
+          "enabled": true,
+          "aggressive": false
+        },
+        "purge_errors": {
+          "enabled": true,
+          "turns": 5
+        }
+      }
+    }
+  },
+  "skills": {
+    "sources": [
+      {
+        "path": "~/.config/opencode/skills",
+        "recursive": true
+      }
+    ]
+  },
+  "disabled_hooks": [],
+  "auto_update": true,
+  "team_mode": {
+    "enabled": true,
+    "tmux_visualization": true,
+    "max_parallel_members": 4,
+    "max_members": 8,
+    "max_messages_per_run": 10000,
+    "max_wall_clock_minutes": 120,
+    "max_member_turns": 500
+  }
+}

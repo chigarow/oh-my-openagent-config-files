@@ -356,6 +356,9 @@
   "background_task": {
     "defaultConcurrency": 5,
     "staleTimeoutMs": 180000,
+    "messageStalenessTimeoutMs": 600000,
+    "sessionGoneTimeoutMs": 60000,
+    "taskTtlMs": 1800000,
     "circuitBreaker": {
       "enabled": true,
       "maxToolCalls": 200,
